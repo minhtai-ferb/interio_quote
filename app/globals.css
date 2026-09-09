@@ -1,9 +1,25 @@
+:root {
+  /* This UI is light-only. Without this, iOS/Safari applies its own dark-mode
+     appearance to form controls (buttons, inputs, textareas, selects) when the
+     device is in Dark Mode — flipping their text to white regardless of our
+     inline styles. A white-on-white button (e.g. an unstyled "Lưu" button on
+     a white background) then renders with no visible label at all. */
+  color-scheme: light;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   background: #f7f7f5;
   max-width: 100vw;
+}
+
+button,
+input,
+select,
+textarea {
+  color: inherit;
 }
 
 body {
