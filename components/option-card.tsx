@@ -1,6 +1,7 @@
 import { COLORS } from "@/lib/theme";
 import { ImageUploader } from "@/components/image-uploader";
 import { ActionForm } from "@/components/action-form";
+import { MoneyInput } from "@/components/money-input";
 
 export interface OptionCardItemVariant {
   id: string;
@@ -88,8 +89,8 @@ export function OptionCard({
               <span style={{ fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600 }}>
                 Giá từ (đ)
               </span>
-              <input
-                type="number" name="priceFrom" defaultValue={option.priceFrom} min={0} step={100000}
+              <MoneyInput
+                name="priceFrom" defaultValue={option.priceFrom}
                 style={{ height: 36, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }}
               />
             </label>
@@ -97,8 +98,8 @@ export function OptionCard({
               <span style={{ fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600 }}>
                 Giá đến (đ)
               </span>
-              <input
-                type="number" name="priceTo" defaultValue={option.priceTo} min={0} step={100000}
+              <MoneyInput
+                name="priceTo" defaultValue={option.priceTo}
                 style={{ height: 36, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }}
               />
             </label>
@@ -170,7 +171,7 @@ export function OptionCard({
         >
           <input name="name" placeholder="Tên hạng mục" required style={fieldStyle} />
           <input name="spec" placeholder="Mô tả / vật liệu" style={fieldStyle} />
-          <input type="number" name="price" placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+          <MoneyInput name="price" placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
           <button type="submit" style={{ flex: "none", minHeight: 34, padding: "8px 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
             + Thêm hạng mục
           </button>
@@ -203,9 +204,7 @@ function ItemBlock({
               </ActionForm>
             </div>
           ) : (
-            <div style={{ width: 90 }}>
-              <ImageUploader folder={imageFolder} onUploaded={actions.setItemImage.bind(null, item.id)} />
-            </div>
+            <ImageUploader compact folder={imageFolder} onUploaded={actions.setItemImage.bind(null, item.id)} />
           )}
         </div>
 
@@ -218,7 +217,7 @@ function ItemBlock({
         >
           <input name="name" defaultValue={item.name} placeholder="Tên hạng mục" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 13, fontWeight: 600 }} />
           <input name="spec" defaultValue={item.spec ?? ""} placeholder="Mô tả / vật liệu" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
-          <input type="number" name="price" defaultValue={item.price ?? ""} placeholder="Giá cơ bản" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, maxWidth: 160, textAlign: "right" }} />
+          <MoneyInput name="price" defaultValue={item.price} placeholder="Giá cơ bản" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, maxWidth: 160, textAlign: "right" }} />
           <div style={{ display: "flex", gap: 8 }}>
             <button type="submit" data-intent="save" style={{ minHeight: 30, padding: "0 12px", border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
               Lưu
@@ -245,7 +244,7 @@ function ItemBlock({
           >
             <input name="name" defaultValue={v.name} placeholder="Tên option phụ" style={fieldStyle} />
             <input name="spec" defaultValue={v.spec ?? ""} placeholder="Mô tả" style={fieldStyle} />
-            <input type="number" name="price" defaultValue={v.price} placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+            <MoneyInput name="price" defaultValue={v.price} placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
             <div style={{ display: "flex", gap: 4, flex: "none" }}>
               <button type="submit" data-intent="save" style={{ width: 28, height: 28, border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11 }} title="Lưu">
                 ✓
@@ -263,7 +262,7 @@ function ItemBlock({
         >
           <input name="name" placeholder="Tên option phụ" required style={fieldStyle} />
           <input name="spec" placeholder="Mô tả" style={fieldStyle} />
-          <input type="number" name="price" placeholder="Giá" required style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+          <MoneyInput name="price" placeholder="Giá" required style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
           <button type="submit" style={{ flex: "none", minHeight: 32, padding: "0 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>
             + Thêm
           </button>

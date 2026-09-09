@@ -24,6 +24,7 @@ import {
 import { OptionCard } from "@/components/option-card";
 import { ActionForm } from "@/components/action-form";
 import { CreateRoomForm } from "@/components/create-room-form";
+import { MoneyInput } from "@/components/money-input";
 import { COLORS, trieu } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
@@ -161,8 +162,8 @@ export default async function TemplateEditorPage({
                   style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}
                 >
                   <input name="name" placeholder="Tên phương án" required style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
-                  <input type="number" name="priceFrom" placeholder="Giá từ" required min={0} step={100000} style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
-                  <input type="number" name="priceTo" placeholder="Giá đến" required min={0} step={100000} style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
+                  <MoneyInput name="priceFrom" placeholder="Giá từ" required style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
+                  <MoneyInput name="priceTo" placeholder="Giá đến" required style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
                   <input name="description" placeholder="Mô tả ngắn" style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, gridColumn: "1/-1" }} />
                   <button type="submit" style={{ minHeight: 38, padding: "9px 14px", background: COLORS.navy, color: "#fff", border: 0, cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}>
                     + Thêm phương án

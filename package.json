@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.3.4",
     "@neondatabase/serverless": "^1.1.0",
     "cloudinary": "^2.11.0",
     "jose": "^6.2.12",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getQuoteById } from "@/lib/queries/quote.queries";
 import { finalizeQuoteFormAction } from "@/actions/quote.actions";
+import { MoneyInput } from "@/components/money-input";
 import { COLORS, trieu } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
@@ -71,10 +72,9 @@ export default async function FinalizeQuotePage({
                       )}
                       <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
                         <span style={{ fontSize: 11.5, color: COLORS.muted }}>Giá chốt cho khu vực này (đ)</span>
-                        <input
-                          type="number" name={`price_${room.id}`}
+                        <MoneyInput
+                          name={`price_${room.id}`}
                           defaultValue={isCustomerPick ? room.selectedFinalPrice ?? midpoint : midpoint}
-                          min={0} step={100000}
                           style={{ width: 160, height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, textAlign: "right" }}
                         />
                       </span>
@@ -91,7 +91,7 @@ export default async function FinalizeQuotePage({
             <span style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600 }}>
               Chiết khấu (đ)
             </span>
-            <input type="number" name="discountAmount" defaultValue={quote.discountAmount || 0} min={0} step={100000} style={{ height: 42, padding: "0 12px", border: `1px solid ${COLORS.border}`, fontSize: 14 }} />
+            <MoneyInput name="discountAmount" defaultValue={quote.discountAmount || 0} style={{ height: 42, padding: "0 12px", border: `1px solid ${COLORS.border}`, fontSize: 14 }} />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: 7, gridColumn: "1/-1" }}>
             <span style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600 }}>

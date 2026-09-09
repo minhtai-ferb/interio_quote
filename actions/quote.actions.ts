@@ -32,31 +32,42 @@ function optionalFloat(value: FormDataEntryValue | null): number | null {
 
 // ── Create quote (customer + copy-from-template) ──
 
-export async function createQuoteAction(formData: FormData) {
-  const customerName = requireText(formData.get("customerName"), "Tên khách hàng");
-  const customerPhone = optionalText(formData.get("customerPhone"));
-  const customerEmail = optionalText(formData.get("customerEmail"));
-  const templateId = requireText(formData.get("templateId"), "Template");
-  const projectType = optionalText(formData.get("projectType"));
-  const areaM2 = optionalFloat(formData.get("areaM2"));
-  const note = optionalText(formData.get("note"));
+export type CreateQuoteState = { error: string } | undefined;
 
-  const customer = await createCustomer({
-    name: customerName,
-    phone: customerPhone,
-    email: customerEmail,
-  });
+export async function createQuoteAction(
+  _prevState: CreateQuoteState,
+  formData: FormData
+): Promise<CreateQuoteState> {
+  let quoteId: string;
+  try {
+    const customerName = requireText(formData.get("customerName"), "Tên khách hàng");
+    const customerPhone = optionalText(formData.get("customerPhone"));
+    const customerEmail = optionalText(formData.get("customerEmail"));
+    const templateId = requireText(formData.get("templateId"), "Template");
+    const projectType = optionalText(formData.get("projectType"));
+    const areaM2 = optionalFloat(formData.get("areaM2"));
+    const note = optionalText(formData.get("note"));
 
-  const quote = await quoteQueries.createQuoteFromTemplate({
-    customerId: customer.id,
-    templateId,
-    projectType,
-    areaM2,
-    note,
-  });
+    const customer = await createCustomer({
+      name: customerName,
+      phone: customerPhone,
+      email: customerEmail,
+    });
+
+    const quote = await quoteQueries.createQuoteFromTemplate({
+      customerId: customer.id,
+      templateId,
+      projectType,
+      areaM2,
+      note,
+    });
+    quoteId = quote.id;
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Tạo báo giá thất bại, vui lòng thử lại" };
+  }
 
   revalidatePath("/admin/quotes");
-  redirect(`/admin/quotes/${quote.id}`);
+  redirect(`/admin/quotes/${quoteId}`);
 }
 
 // ── Quote editor: info & staff fields ──
