@@ -67,6 +67,28 @@ input:focus-visible {
   }
 }
 
+/* The Template/Quote editor 3-column layout (room nav / options / budget rail)
+   wraps via flex-wrap once the viewport is too narrow, but each column keeps
+   its desktop flex-basis (e.g. 260-300px) instead of stretching to fill the
+   row — on a phone that leaves the wrapped column visibly narrower than the
+   screen, with a gray gap of page background down its right side. Below this
+   breakpoint (comfortably under the ~760-820px the three columns' min-widths
+   sum to, so it only kicks in once they've actually stacked), force each
+   column to fill the full row. */
+@media (max-width: 900px) {
+  .iq-editor-col {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  /* A sticky rail only makes sense beside other columns on desktop; once it's
+     a full-width block stacked below a long option list, sticky positioning
+     just makes it awkwardly detach from the page as you scroll past it. */
+  .iq-editor-sticky {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
 @keyframes iq-toast-in {
   from {
     opacity: 0;

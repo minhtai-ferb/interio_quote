@@ -55,7 +55,7 @@ export default async function QuoteEditorPage({
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "stretch", minHeight: "calc(100vh - 60px)" }}>
-      <div style={{ flex: "0 1 280px", minWidth: 240, background: "#fff", borderRight: `1px solid ${COLORS.border}`, padding: "26px 22px" }}>
+      <div className="iq-editor-col" style={{ flex: "0 1 280px", minWidth: 240, background: "#fff", borderRight: `1px solid ${COLORS.border}`, padding: "26px 22px" }}>
         <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 8 }}>
           {quote.code}
         </div>
@@ -121,7 +121,7 @@ export default async function QuoteEditorPage({
         )}
       </div>
 
-      <div style={{ flex: "1 1 460px", minWidth: 320, padding: "clamp(22px,3vw,40px)" }}>
+      <div className="iq-editor-col" style={{ flex: "1 1 460px", minWidth: 320, padding: "clamp(22px,3vw,40px)" }}>
         {!activeRoom ? (
           <div style={{ fontSize: 14, color: COLORS.muted }}>Chưa có khu vực nào trong báo giá này.</div>
         ) : (
@@ -196,8 +196,8 @@ export default async function QuoteEditorPage({
         )}
       </div>
 
-      <div style={{ flex: "0 1 300px", minWidth: 260, background: "#fff", borderLeft: `1px solid ${COLORS.border}` }}>
-        <div style={{ position: "sticky", top: 60, padding: "26px 22px" }}>
+      <div className="iq-editor-col" style={{ flex: "0 1 300px", minWidth: 260, background: "#fff", borderLeft: `1px solid ${COLORS.border}` }}>
+        <div className="iq-editor-sticky" style={{ position: "sticky", top: 60, padding: "26px 22px" }}>
           <div style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 18 }}>
             Ngân sách dự kiến
           </div>

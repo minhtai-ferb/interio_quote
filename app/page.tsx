@@ -1,12 +1,23 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { COLORS } from "@/lib/theme";
+import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
+import { loginAction } from "@/actions/auth.actions";
 
-async function signIn() {
-  "use server";
-  redirect("/admin/quotes");
-}
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; error?: string }>;
+}) {
+  const sp = await searchParams;
+  const next = sp.next && sp.next.startsWith("/") ? sp.next : "/admin/quotes";
 
-export default function LoginPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  if (token && (await verifySessionToken(token))) {
+    redirect(next);
+  }
+
   return (
     <div style={{ display: "flex", flexWrap: "wrap", minHeight: "100vh" }}>
       <div
@@ -38,18 +49,24 @@ export default function LoginPage() {
         </div>
       </div>
       <div style={{ flex: "1 1 420px", background: "#fff", padding: "clamp(40px,6vw,88px)", display: "flex", alignItems: "center" }}>
-        <form action={signIn} style={{ width: "100%", maxWidth: 360 }}>
+        <form action={loginAction} style={{ width: "100%", maxWidth: 360 }}>
+          <input type="hidden" name="next" value={next} />
           <div style={{ fontSize: 26, fontWeight: 600, marginBottom: 6 }}>Welcome back</div>
           <div style={{ fontSize: 13.5, color: COLORS.muted, marginBottom: 34 }}>
             Đăng nhập để quản lý báo giá.
           </div>
+          {sp.error && (
+            <div style={{ padding: "10px 13px", marginBottom: 18, background: "#FEF1F0", border: "1px solid #F3B4AE", color: "#B42318", fontSize: 13 }}>
+              Email hoặc mật khẩu không đúng.
+            </div>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
               <span style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600 }}>
                 Email
               </span>
               <input
-                type="email" name="email" placeholder="ban@studio.vn"
+                type="email" name="email" required autoComplete="username" placeholder="ban@studio.vn"
                 style={{ height: 44, padding: "0 13px", border: `1px solid ${COLORS.border}`, background: "#fff", fontSize: 14, color: COLORS.text }}
               />
             </label>
@@ -58,7 +75,7 @@ export default function LoginPage() {
                 Password
               </span>
               <input
-                type="password" name="password"
+                type="password" name="password" required autoComplete="current-password"
                 style={{ height: 44, padding: "0 13px", border: `1px solid ${COLORS.border}`, background: "#fff", fontSize: 14, color: COLORS.text }}
               />
             </label>

@@ -66,7 +66,7 @@ export default async function TemplateEditorPage({
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
-        <div style={{ flex: "0 1 260px", minWidth: 220 }}>
+        <div className="iq-editor-col" style={{ flex: "0 1 260px", minWidth: 220 }}>
           <div style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 12 }}>
             Khu vực
           </div>
@@ -101,7 +101,7 @@ export default async function TemplateEditorPage({
           </ActionForm>
         </div>
 
-        <div style={{ flex: "1 1 460px", minWidth: 320 }}>
+        <div className="iq-editor-col" style={{ flex: "1 1 460px", minWidth: 320 }}>
           {!activeRoom ? (
             <div style={{ fontSize: 14, color: COLORS.muted, padding: "40px 0" }}>
               Chưa có khu vực nào. Thêm khu vực đầu tiên ở cột bên trái.
@@ -168,7 +168,7 @@ export default async function TemplateEditorPage({
           )}
         </div>
 
-        <div style={{ flex: "0 1 260px", minWidth: 220 }}>
+        <div className="iq-editor-col" style={{ flex: "0 1 260px", minWidth: 220 }}>
           <div style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 16 }}>
             Khoảng giá template
           </div>
