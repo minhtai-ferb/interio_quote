@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-671aa52e-df86-4ac1-8974-ea3bc74b9d04/styles.css">
+<script src="_ds/modernist-671aa52e-df86-4ac1-8974-ea3bc74b9d04/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#F7F7F5; }
+  body { font-family:'Archivo', sans-serif; color:#1F2933; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:#163A5F; text-decoration:none; }
+  a:hover { color:#102E4D; text-decoration:underline; }
+  input, button, select, textarea { font-family:'Archivo', sans-serif; }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline:2px solid #163A5F; outline-offset:2px; }
+  ::selection { background:#EAF1F7; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#F7F7F5">
+
+<sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+  <div style="position:sticky;top:0;z-index:60;display:flex;align-items:stretch;background:#163A5F;color:#fff;overflow-x:auto">
+    <div style="display:flex;align-items:center;padding:0 18px;flex:none;border-right:1px solid rgba(255,255,255,.18)">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap">Prototype</span>
+    </div>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+      <button type="button" onClick="{{ n.go }}" style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px;background:{{ n.bg }};color:{{ n.fg }};border:0;border-right:1px solid rgba(255,255,255,.18);cursor:pointer;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">
+        <span style="opacity:.6;font-variant-numeric:tabular-nums">{{ n.num }}</span>
+        <span style="font-weight:600">{{ n.label }}</span>
+      </button>
+    </sc-for>
+  </div>
+</sc-if>
+
+<!-- ══ 01 LOGIN ══ -->
+<sc-if value="{{ isLogin }}">
+  <div style="display:flex;flex-wrap:wrap;min-height:calc(100vh - 42px)">
+    <div style="flex:1 1 420px;background:#163A5F;color:#fff;padding:clamp(40px,6vw,88px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;min-height:340px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase">Nội Thất<span style="opacity:.55">&nbsp;/ Studio</span></div>
+      <div>
+        <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:18px">Consultation &amp; Quotation</div>
+        <div style="font-size:clamp(30px,3.6vw,48px);line-height:1.08;font-weight:600;max-width:16em;text-wrap:pretty">Xây dựng báo giá nội thất riêng cho từng khách hàng.</div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.7;opacity:.6;max-width:30em">Template → Báo giá riêng → Khách chọn từng hạng mục → Chốt &amp; xuất PDF.</div>
+    </div>
+    <div style="flex:1 1 420px;background:#fff;padding:clamp(40px,6vw,88px);display:flex;align-items:center">
+      <div style="width:100%;max-width:360px">
+        <div style="font-size:26px;font-weight:600;margin-bottom:6px">Welcome back</div>
+        <div style="font-size:13.5px;color:#667085;margin-bottom:34px">Đăng nhập để quản lý báo giá.</div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600">Email</span>
+            <input type="email" value="an.nguyen@studio.vn" style="height:44px;padding:0 13px;border:1px solid #E4E9EE;background:#fff;font-size:14px;color:#1F2933" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600">Password</span>
+            <input type="password" value="••••••••••" style="height:44px;padding:0 13px;border:1px solid #E4E9EE;background:#fff;font-size:14px;color:#1F2933" />
+          </label>
+          <button type="button" onClick="{{ goList }}" style="min-height:46px;margin-top:6px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600;letter-spacing:.04em;text-align:left;padding:13px 16px" style-hover="background:#102E4D">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ ADMIN CHROME ══ -->
+<sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:center;gap:26px;height:60px;padding:0 clamp(16px,3vw,36px);background:#fff;border-bottom:1px solid #E4E9EE;position:sticky;top:42px;z-index:50">
+    <div style="font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#163A5F;white-space:nowrap">Nội Thất</div>
+    <div style="display:flex;gap:2px">
+      <sc-for list="{{ adminTabs }}" as="t" hint-placeholder-count="2">
+        <button type="button" onClick="{{ t.go }}" style="padding:8px 12px;border:0;background:transparent;cursor:pointer;font-size:13px;white-space:nowrap;font-weight:{{ t.w }};color:{{ t.fg }};border-bottom:2px solid {{ t.bd }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;flex:none;background:#EAF1F7;color:#163A5F;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">AN</div>
+      <span style="font-size:12.5px;color:#667085;white-space:nowrap">An Nguyễn</span>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 02 QUOTE LIST ══ -->
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1180px;margin:0 auto;padding:clamp(28px,4vw,56px) clamp(16px,3vw,36px) 90px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-bottom:30px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Dashboard</div>
+        <div style="font-size:clamp(28px,3.4vw,40px);font-weight:600;line-height:1.05">Báo giá</div>
+        <div style="font-size:14px;color:#667085;margin-top:8px">Quản lý và theo dõi các báo giá khách hàng.</div>
+      </div>
+      <button type="button" onClick="{{ goCreate }}" style="flex:none;white-space:nowrap;min-height:44px;padding:12px 18px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left" style-hover="background:#102E4D">+ Tạo báo giá mới</button>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-bottom:16px;border-bottom:2px solid #1F2933">
+      <input type="text" placeholder="Tìm theo tên khách hàng…" style="flex:1 1 240px;height:38px;padding:0 12px;border:1px solid #E4E9EE;background:#fff;font-size:13px" />
+      <div style="display:flex">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+          <button type="button" onClick="{{ f.go }}" style="min-height:38px;white-space:nowrap;padding:10px 14px;border:1px solid {{ f.bd }};border-right:0;background:{{ f.bg }};color:{{ f.fg }};cursor:pointer;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">{{ f.label }}</button>
+        </sc-for>
+        <div style="width:1px;background:#E4E9EE"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr;background:#fff">
+      <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="4">
+        <button type="button" onClick="{{ q.go }}" style="display:grid;grid-template-columns:minmax(170px,1.5fr) minmax(130px,1.1fr) minmax(140px,1fr) minmax(170px,auto);gap:18px;align-items:center;text-align:left;padding:20px 22px;border:0;border-bottom:1px solid #E4E9EE;background:#fff;cursor:pointer" style-hover="background:#EAF1F7">
+          <div>
+            <div style="font-size:11px;letter-spacing:.14em;color:#667085;font-variant-numeric:tabular-nums;margin-bottom:5px">{{ q.code }}</div>
+            <div style="font-size:16.5px;font-weight:600">{{ q.name }}</div>
+          </div>
+          <div style="font-size:13.5px;color:#667085">{{ q.project }}</div>
+          <div style="font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">{{ q.range }}</div>
+          <div style="display:flex;align-items:center;gap:16px;justify-content:flex-end">
+            <span style="font-size:12px;color:#667085;font-variant-numeric:tabular-nums;white-space:nowrap">{{ q.date }}</span>
+            <span style="display:inline-flex;align-items:center;flex:none;white-space:nowrap;padding:5px 10px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:{{ q.stBg }};color:{{ q.stFg }};border:1px solid {{ q.stBd }}">{{ q.status }}</span>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 03 CREATE QUOTE ══ -->
+<sc-if value="{{ isCreate }}">
+  <div style="max-width:900px;margin:0 auto;padding:clamp(28px,4vw,56px) clamp(16px,3vw,36px) 90px">
+    <button type="button" onClick="{{ goList }}" style="border:0;background:transparent;padding:0;margin-bottom:26px;cursor:pointer;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#667085;font-weight:600;white-space:nowrap">← Báo giá</button>
+    <div style="font-size:clamp(26px,3.2vw,38px);font-weight:600;margin-bottom:38px">Tạo báo giá mới</div>
+    <div style="background:#fff;border:1px solid #E4E9EE">
+      <div style="padding:26px clamp(18px,3vw,32px);border-bottom:1px solid #E4E9EE">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#163A5F;font-weight:700;margin-bottom:20px">Thông tin khách hàng</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px">
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Tên khách hàng</span>
+            <input type="text" value="Nguyễn Văn A" style="height:42px;padding:0 12px;border:1px solid #E4E9EE;font-size:14px" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Số điện thoại</span>
+            <input type="text" value="0912 345 678" style="height:42px;padding:0 12px;border:1px solid #E4E9EE;font-size:14px" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Email</span>
+            <input type="text" value="vana@email.com" style="height:42px;padding:0 12px;border:1px solid #E4E9EE;font-size:14px" />
+          </label>
+        </div>
+      </div>
+      <div style="padding:26px clamp(18px,3vw,32px);border-bottom:1px solid #E4E9EE">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#163A5F;font-weight:700;margin-bottom:20px">Thông tin công trình</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px">
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Loại công trình</span>
+            <select style="height:42px;padding:0 10px;border:1px solid #E4E9EE;font-size:14px;background:#fff">
+              <option>Căn hộ</option>
+              <option>Nhà phố</option>
+              <option>Biệt thự</option>
+            </select>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Diện tích (m²)</span>
+            <input type="text" value="75" style="height:42px;padding:0 12px;border:1px solid #E4E9EE;font-size:14px" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px;grid-column:1/-1">
+            <span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#667085;font-weight:600">Ghi chú</span>
+            <input type="text" placeholder="Gia đình 3 người, ưu tiên phòng khách và bếp." style="height:42px;padding:0 12px;border:1px solid #E4E9EE;font-size:14px" />
+          </label>
+        </div>
+      </div>
+      <div style="padding:26px clamp(18px,3vw,32px)">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#163A5F;font-weight:700;margin-bottom:20px">Chọn template</div>
+        <div style="border-top:1px solid #E4E9EE">
+          <sc-for list="{{ templatePicks }}" as="t" hint-placeholder-count="3">
+            <button type="button" onClick="{{ t.go }}" style="display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:18px 4px;border:0;border-bottom:1px solid #E4E9EE;background:transparent;cursor:pointer">
+              <span style="width:16px;height:16px;flex:none;border:1px solid {{ t.dotBd }};background:#fff;display:flex;align-items:center;justify-content:center">
+                <span style="width:8px;height:8px;background:{{ t.dot }}"></span>
+              </span>
+              <span style="flex:1">
+                <span style="display:block;font-size:15.5px;font-weight:600">{{ t.name }}</span>
+                <span style="display:block;font-size:12.5px;color:#667085;margin-top:3px">{{ t.meta }}</span>
+              </span>
+              <span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">{{ t.range }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{ goEditor }}" style="margin-top:26px;min-height:46px;padding:13px 20px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left" style-hover="background:#102E4D">Tạo báo giá</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 04 QUOTE EDITOR / 06 TEMPLATE EDITOR ══ -->
+<sc-if value="{{ isEditor }}">
+  <div style="display:flex;flex-wrap:wrap;align-items:stretch;min-height:calc(100vh - 102px)">
+
+    <div style="flex:0 1 268px;min-width:240px;background:#fff;border-right:1px solid #E4E9EE;padding:26px 22px">
+      <sc-if value="{{ isQuoteEditor }}">
+        <div>
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:8px">{{ quoteCode }}</div>
+          <div style="font-size:19px;font-weight:600;margin-bottom:4px">Nguyễn Văn A</div>
+          <div style="font-size:13px;color:#667085">Căn hộ • 75m²</div>
+          <div style="display:inline-block;white-space:nowrap;margin-top:14px;padding:5px 10px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#EAF1F7;color:#163A5F;border:1px solid #163A5F">Đang tư vấn</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isTemplateEditor }}">
+        <div>
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:8px">Template</div>
+          <div style="font-size:19px;font-weight:600;margin-bottom:4px">Căn hộ 2PN – Modern</div>
+          <div style="font-size:13px;color:#667085">3 phòng • 9 phương án</div>
+        </div>
+      </sc-if>
+
+      <div style="height:2px;background:#1F2933;margin:24px 0 18px"></div>
+      <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:12px">Khu vực</div>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <sc-for list="{{ roomNav }}" as="r" hint-placeholder-count="3">
+          <button type="button" onClick="{{ r.go }}" style="display:flex;align-items:baseline;gap:11px;text-align:left;padding:11px 12px;border:0;border-left:2px solid {{ r.bd }};background:{{ r.bg }};color:#1F2933;cursor:pointer">
+            <span style="font-size:11px;opacity:.55;font-variant-numeric:tabular-nums">{{ r.num }}</span>
+            <span style="flex:1">
+              <span style="display:block;font-size:14px;font-weight:600">{{ r.name }}</span>
+              <span style="display:block;font-size:11.5px;opacity:.65;margin-top:2px">{{ r.sub }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex:1 1 460px;min-width:320px;padding:clamp(22px,3vw,40px)">
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:26px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:9px">Khu vực {{ room.num }}</div>
+          <div style="font-size:clamp(26px,3vw,36px);font-weight:600;line-height:1.05">{{ room.name }}</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button type="button" onClick="{{ openDrawer }}" style="flex:none;white-space:nowrap;min-height:38px;padding:10px 14px;background:#fff;color:#667085;border:1px solid #E4E9EE;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:#EAF1F7">Sửa nhanh</button>
+          <button type="button" onClick="{{ goPricesRoom }}" style="flex:none;white-space:nowrap;min-height:38px;padding:10px 14px;background:#fff;color:#163A5F;border:1px solid #163A5F;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:#EAF1F7">Chỉnh sửa giá &amp; hình ảnh →</button>
+        </div>
+      </div>
+
+      <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Gói giải pháp</div>
+      <div style="display:flex;flex-wrap:wrap;margin-bottom:26px">
+        <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+          <button type="button" onClick="{{ t.go }}" style="flex:1 1 150px;padding:13px 14px;text-align:left;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};cursor:pointer;margin-right:-1px">
+            <span style="display:block;font-size:13.5px;font-weight:600">{{ t.label }}</span>
+            <span style="display:block;font-size:12px;opacity:.72;margin-top:3px;font-variant-numeric:tabular-nums">{{ t.price }}</span>
+            <span style="display:block;font-size:11px;opacity:.6;margin-top:2px">{{ t.count }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2px;margin-bottom:30px">
+        <sc-for list="{{ room.images }}" as="im">
+          <image-slot id="{{ im.id }}" shape="rect" fit="cover" placeholder="Ảnh không gian" src="{{ im.src }}" credit="{{ im.credit }}" credit-href="{{ im.href }}" style="width:100%;height:132px;display:block"></image-slot>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:12px">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600">Hạng mục chi tiết</div>
+        <div style="font-size:11.5px;color:#667085;white-space:nowrap">{{ room.countLabel }}</div>
+      </div>
+      <div style="border-top:2px solid #1F2933;background:#fff">
+        <sc-for list="{{ roomItems }}" as="it" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:148px minmax(150px,1.3fr) minmax(180px,1.5fr) minmax(110px,auto);gap:16px;align-items:start;padding:16px 14px;border-bottom:1px solid #E4E9EE">
+            <image-slot id="{{ it.slotId }}" shape="rect" fit="cover" placeholder="{{ it.name }}" src="{{ it.slotSrc }}" credit="{{ it.slotCredit }}" credit-href="{{ it.slotHref }}" style="width:148px;height:108px;display:block"></image-slot>
+            <div>
+              <div style="font-size:14.5px;font-weight:600">{{ it.name }}</div>
+              <div style="font-size:11.5px;color:#667085;margin-top:4px;font-variant-numeric:tabular-nums">{{ it.size }}</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ it.variants }}" as="v" hint-placeholder-count="3">
+                <button type="button" onClick="{{ v.go }}" style="padding:6px 9px;border:1px solid {{ v.bd }};background:{{ v.bg }};color:{{ v.fg }};cursor:pointer;font-size:11.5px;text-align:left">{{ v.label }}</button>
+              </sc-for>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">{{ it.price }}</div>
+              <button type="button" onClick="{{ it.toggle }}" style="margin-top:6px;border:0;background:transparent;padding:0;cursor:pointer;font-size:11px;color:#667085;white-space:nowrap" style-hover="color:#163A5F">{{ it.toggleLabel }}</button>
+            </div>
+          </div>
+        </sc-for>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;padding:18px 14px;border-bottom:2px solid #1F2933">
+          <span style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#667085;font-weight:600">Tạm tính {{ room.name }}</span>
+          <span style="font-size:22px;font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums;white-space:nowrap">{{ room.subtotal }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:0 1 300px;min-width:260px;background:#fff;border-left:1px solid #E4E9EE">
+      <div style="position:sticky;top:102px;padding:26px 22px">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:18px">{{ railTitle }}</div>
+        <sc-for list="{{ budget }}" as="b" hint-placeholder-count="3">
+          <div style="padding:13px 0;border-bottom:1px solid #E4E9EE">
+            <div style="display:flex;justify-content:space-between;gap:10px">
+              <span style="font-size:13.5px;font-weight:600">{{ b.room }}</span>
+              <span style="font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap">{{ b.amount }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:10px;margin-top:5px">
+              <span style="font-size:11.5px;color:#667085">{{ b.tier }}</span>
+              <span style="font-size:11.5px;color:#667085;font-variant-numeric:tabular-nums">{{ b.pct }}</span>
+            </div>
+            <div style="height:4px;background:#EAF1F7;margin-top:7px">
+              <div style="height:4px;background:#163A5F;width:{{ b.pct }}"></div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="height:2px;background:#1F2933;margin:18px 0 14px"></div>
+        <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:6px">Tổng dự kiến</div>
+        <div style="font-size:23px;font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums;line-height:1.15">{{ total }}</div>
+        <div style="font-size:11.5px;color:#667085;margin-top:6px">{{ totalRange }}</div>
+
+        <sc-if value="{{ isQuoteEditor }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:24px">
+            <button type="button" onClick="{{ goCustomer }}" style="min-height:42px;padding:11px 14px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13px;font-weight:600;text-align:left" style-hover="background:#102E4D">Xem trang khách →</button>
+            <button type="button" onClick="{{ copyLink }}" style="min-height:42px;padding:11px 14px;background:#fff;color:#163A5F;border:1px solid #E4E9EE;cursor:pointer;font-size:13px;font-weight:600;text-align:left" style-hover="background:#EAF1F7">{{ copyLabel }}</button>
+            <button type="button" onClick="{{ finalize }}" style="min-height:42px;padding:11px 14px;background:#fff;color:#163A5F;border:1px solid #163A5F;cursor:pointer;font-size:13px;font-weight:600;text-align:left" style-hover="background:#EAF1F7">Chốt báo giá &amp; xuất PDF</button>
+            <div style="font-size:11.5px;color:#667085;margin-top:4px;font-variant-numeric:tabular-nums">domain.com/q/abc123</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isTemplateEditor }}">
+          <button type="button" onClick="{{ goTemplates }}" style="width:100%;min-height:42px;margin-top:24px;padding:11px 14px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13px;font-weight:600;text-align:left" style-hover="background:#102E4D">Lưu Template</button>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ drawer }}">
+    <div style="position:fixed;inset:0;z-index:80;display:flex;justify-content:flex-end;background:rgba(31,41,51,.42)">
+      <div onClick="{{ closeDrawer }}" style="flex:1"></div>
+      <div style="width:min(460px,100%);background:#fff;height:100%;overflow-y:auto;border-left:2px solid #1F2933">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 24px;border-bottom:1px solid #E4E9EE;position:sticky;top:0;background:#fff">
+          <div>
+            <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#667085;font-weight:600">{{ room.name }}</div>
+            <div style="font-size:17px;font-weight:600;margin-top:3px">{{ room.tierLabel }}</div>
+          </div>
+          <button type="button" onClick="{{ closeDrawer }}" style="width:32px;height:32px;flex:none;border:1px solid #E4E9EE;background:#fff;cursor:pointer;font-size:15px;color:#667085" style-hover="background:#EAF1F7">✕</button>
+        </div>
+        <div style="padding:24px">
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#163A5F;font-weight:700;margin-bottom:14px">Giá từng hạng mục</div>
+          <sc-for list="{{ draft.items }}" as="it" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #E4E9EE">
+              <span style="flex:1;min-width:0">
+                <span style="display:block;font-size:13.5px;font-weight:600">{{ it.name }}</span>
+                <span style="display:block;font-size:11px;color:#667085;margin-top:2px">{{ it.variant }}</span>
+              </span>
+              <input type="number" value="{{ it.price }}" onChange="{{ it.setPrice }}" style="width:132px;flex:none;height:34px;padding:0 8px;border:1px solid #E4E9EE;font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums" />
+              <button type="button" onClick="{{ it.remove }}" style="width:26px;height:26px;flex:none;border:1px solid #E4E9EE;background:#fff;cursor:pointer;color:#667085;font-size:11px" style-hover="background:#EAF1F7">✕</button>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <input type="text" value="{{ draft.newItem }}" onChange="{{ setNewItem }}" placeholder="Tên hạng mục / mẫu nội thất" style="flex:1;min-width:0;height:38px;padding:0 12px;border:1px solid #E4E9EE;font-size:13px" />
+            <input type="number" value="{{ draft.newPrice }}" onChange="{{ setNewPrice }}" placeholder="Giá" style="width:110px;flex:none;height:38px;padding:0 10px;border:1px solid #E4E9EE;font-size:13px;text-align:right" />
+            <button type="button" onClick="{{ addItem }}" style="min-height:38px;white-space:nowrap;padding:10px 14px;background:#EAF1F7;border:1px solid #163A5F;color:#163A5F;cursor:pointer;font-size:12.5px;font-weight:600">+ Thêm</button>
+          </div>
+
+          <div style="height:1px;background:#E4E9EE;margin:26px 0"></div>
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#163A5F;font-weight:700;margin-bottom:14px">Hình ảnh</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ draft.images }}" as="im">
+              <div style="display:flex;align-items:center;gap:12px;border:1px solid #E4E9EE;padding:8px">
+                <image-slot id="{{ im.id }}" shape="rect" fit="cover" placeholder="Ảnh" src="{{ im.src }}" credit="{{ im.credit }}" credit-href="{{ im.href }}" style="width:64px;height:48px;flex:none;display:block"></image-slot>
+                <span style="flex:1;font-size:12.5px;color:#667085">{{ im.label }}</span>
+                <button type="button" onClick="{{ im.remove }}" style="width:28px;height:28px;flex:none;border:1px solid #E4E9EE;background:#fff;cursor:pointer;color:#667085;font-size:12px" style-hover="background:#EAF1F7">✕</button>
+              </div>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{ addImage }}" style="margin-top:10px;min-height:38px;white-space:nowrap;padding:10px 13px;background:#fff;border:1px dashed #163A5F;color:#163A5F;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:#EAF1F7">+ Thêm hình ảnh</button>
+
+          <button type="button" onClick="{{ saveDraft }}" style="width:100%;min-height:46px;margin-top:30px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left;padding:13px 16px" style-hover="background:#102E4D">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ══ 05 TEMPLATE LIST ══ -->
+<sc-if value="{{ isTemplates }}">
+  <div style="max-width:1180px;margin:0 auto;padding:clamp(28px,4vw,56px) clamp(16px,3vw,36px) 90px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-bottom:30px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Thư viện</div>
+        <div style="font-size:clamp(28px,3.4vw,40px);font-weight:600;line-height:1.05">Templates</div>
+        <div style="font-size:14px;color:#667085;margin-top:8px">Các bộ giải pháp nội thất mẫu — điểm bắt đầu cho mỗi báo giá.</div>
+      </div>
+      <button type="button" onClick="{{ goTemplateEditor }}" style="flex:none;white-space:nowrap;min-height:44px;padding:12px 18px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left" style-hover="background:#102E4D">+ Tạo Template</button>
+    </div>
+    <div style="border-top:2px solid #1F2933;background:#fff">
+      <sc-for list="{{ templateRows }}" as="t" hint-placeholder-count="3">
+        <button type="button" onClick="{{ t.go }}" style="display:grid;grid-template-columns:110px minmax(190px,1.6fr) minmax(110px,1fr) minmax(140px,auto);gap:20px;align-items:center;width:100%;text-align:left;padding:16px 18px;border:0;border-bottom:1px solid #E4E9EE;background:#fff;cursor:pointer" style-hover="background:#EAF1F7">
+          <image-slot id="{{ t.slotId }}" shape="rect" fit="cover" placeholder="Ảnh template" src="{{ t.img }}" credit="{{ t.credit }}" credit-href="{{ t.href }}" style="width:110px;height:74px;display:block"></image-slot>
+          <span>
+            <span style="display:block;font-size:16.5px;font-weight:600">{{ t.name }}</span>
+            <span style="display:block;font-size:12.5px;color:#667085;margin-top:4px">{{ t.meta }}</span>
+          </span>
+          <span style="font-size:12.5px;color:#667085">{{ t.used }}</span>
+          <span style="font-size:14.5px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">{{ t.range }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 09 QUẢN LÝ GIÁ & HÌNH ẢNH ══ -->
+<sc-if value="{{ isPrices }}">
+  <div style="max-width:1280px;margin:0 auto;padding:clamp(24px,3.4vw,44px) clamp(16px,3vw,36px) 120px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Dữ liệu</div>
+        <div style="font-size:clamp(26px,3.2vw,38px);font-weight:600;line-height:1.05">Giá &amp; hình ảnh</div>
+        <div style="font-size:13.5px;color:#667085;margin-top:8px">{{ priceStats }}</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="font-size:12.5px;color:#667085;white-space:nowrap">{{ changedLabel }}</span>
+        <button type="button" onClick="{{ resetAll }}" style="flex:none;white-space:nowrap;min-height:38px;padding:10px 14px;background:#fff;border:1px solid #E4E9EE;color:#667085;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:#EAF1F7">↺ Hoàn tác tất cả</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-bottom:14px;border-bottom:2px solid #1F2933;position:sticky;top:102px;background:#F7F7F5;z-index:20;padding-top:14px">
+      <input type="text" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Tìm hạng mục hoặc vật liệu…" style="flex:1 1 260px;height:38px;padding:0 12px;border:1px solid #E4E9EE;background:#fff;font-size:13px" />
+      <div style="display:flex">
+        <sc-for list="{{ roomFilters }}" as="f" hint-placeholder-count="4">
+          <button type="button" onClick="{{ f.go }}" style="min-height:38px;white-space:nowrap;padding:10px 13px;border:1px solid {{ f.bd }};border-right:0;background:{{ f.bg }};color:{{ f.fg }};cursor:pointer;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">{{ f.label }}</button>
+        </sc-for>
+        <div style="width:1px;background:#E4E9EE"></div>
+      </div>
+      <button type="button" onClick="{{ toggleUsed }}" style="flex:none;white-space:nowrap;min-height:38px;padding:10px 13px;border:1px solid {{ usedBd }};background:{{ usedBg }};color:{{ usedFg }};cursor:pointer;font-size:11.5px;font-weight:600">{{ usedLabel }}</button>
+    </div>
+
+    <sc-for list="{{ priceRooms }}" as="r" hint-placeholder-count="3">
+      <div style="margin-top:34px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid {{ r.color }}">
+          <div style="display:flex;align-items:baseline;gap:14px;min-width:0">
+            <span style="font-size:12px;color:#667085;font-variant-numeric:tabular-nums;letter-spacing:.1em">{{ r.num }}</span>
+            <span style="font-size:clamp(19px,2.2vw,25px);font-weight:600">{{ r.name }}</span>
+            <span style="font-size:12px;color:#667085;white-space:nowrap">{{ r.count }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+            <span style="font-size:13px;font-weight:600;color:#163A5F;font-variant-numeric:tabular-nums;white-space:nowrap;margin-right:8px">{{ r.subtotal }}</span>
+            <button type="button" onClick="{{ r.cut }}" style="flex:none;white-space:nowrap;min-height:32px;padding:7px 11px;background:#fff;border:1px solid #E4E9EE;color:#667085;cursor:pointer;font-size:11.5px;font-weight:600" style-hover="background:#EAF1F7">−5% phòng</button>
+            <button type="button" onClick="{{ r.bump }}" style="flex:none;white-space:nowrap;min-height:32px;padding:7px 11px;background:#fff;border:1px solid #E4E9EE;color:#667085;cursor:pointer;font-size:11.5px;font-weight:600" style-hover="background:#EAF1F7">+5% phòng</button>
+            <button type="button" onClick="{{ r.reset }}" style="flex:none;white-space:nowrap;min-height:32px;padding:7px 11px;background:#fff;border:1px solid #E4E9EE;color:#667085;cursor:pointer;font-size:11.5px;font-weight:600" style-hover="background:#EAF1F7">↺</button>
+          </div>
+        </div>
+
+        <sc-for list="{{ r.items }}" as="it" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(300px,2.2fr);gap:20px clamp(20px,3vw,40px);padding:20px 0;border-bottom:1px solid #E4E9EE;background:{{ it.rowBg }}">
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <image-slot id="{{ it.slotId }}" shape="rect" fit="cover" placeholder="{{ it.name }}" src="{{ it.slotSrc }}" credit="{{ it.slotCredit }}" credit-href="{{ it.slotHref }}" style="width:148px;height:108px;flex:none;display:block"></image-slot>
+              <div style="min-width:0;flex:1">
+                <label style="display:block">
+                  <span style="display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:2px">Tên hạng mục</span>
+                  <input type="text" value="{{ it.name }}" onChange="{{ it.setName }}" style="width:100%;font-size:15px;font-weight:600;color:#1F2933;border:0;border-bottom:1px solid #E4E9EE;background:transparent;padding:3px 0" style-focus="border-bottom-color:#163A5F" />
+                </label>
+                <label style="display:block;margin-top:10px">
+                  <span style="display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:2px">Kích thước</span>
+                  <input type="text" value="{{ it.size }}" onChange="{{ it.setSize }}" style="width:100%;font-size:12.5px;color:#1F2933;border:0;border-bottom:1px solid #E4E9EE;background:transparent;padding:3px 0;font-variant-numeric:tabular-nums" style-focus="border-bottom-color:#163A5F" />
+                </label>
+                <div style="font-size:11px;color:#667085;margin-top:10px">{{ it.useLabel }}</div>
+              </div>
+            </div>
+            <div>
+              <sc-for list="{{ it.variants }}" as="v" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:minmax(150px,1.4fr) minmax(120px,auto) 24px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid #E4E9EE">
+                  <div style="min-width:0">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <input type="text" value="{{ v.label }}" onChange="{{ v.setLabel }}" style="flex:1;min-width:0;font-size:13.5px;font-weight:{{ v.w }};color:#1F2933;border:0;border-bottom:1px solid #E4E9EE;background:transparent;padding:3px 0" style-focus="border-bottom-color:#163A5F" />
+                      <sc-if value="{{ v.active }}">
+                        <span style="display:inline-flex;flex:none;white-space:nowrap;padding:3px 7px;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#EAF1F7;color:#163A5F">Đang dùng</span>
+                      </sc-if>
+                    </div>
+                    <input type="text" value="{{ v.spec }}" onChange="{{ v.setSpec }}" placeholder="Mô tả / vật liệu" style="width:100%;font-size:11.5px;color:#667085;border:0;border-bottom:1px solid #E4E9EE;background:transparent;padding:3px 0;margin-top:4px" style-focus="border-bottom-color:#163A5F" />
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+                    <input type="number" step="500000" value="{{ v.price }}" onChange="{{ v.set }}" style="width:136px;flex:none;height:34px;padding:0 8px;border:1px solid {{ v.bd }};background:{{ v.bg }};font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums" />
+                    <span style="font-size:11px;color:#667085;white-space:nowrap;width:64px;text-align:right">{{ v.tr }}</span>
+                  </div>
+                  <button type="button" onClick="{{ v.reset }}" style="width:24px;height:24px;flex:none;border:0;background:transparent;cursor:pointer;color:{{ v.resetFg }};font-size:12px" style-hover="color:#163A5F">↺</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+
+    <sc-if value="{{ noResults }}">
+      <div style="padding:60px 0;font-size:14px;color:#667085">Không có hạng mục nào khớp với “{{ query }}”.</div>
+    </sc-if>
+  </div>
+
+  <div style="position:sticky;bottom:0;z-index:30;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:14px clamp(16px,3vw,36px);background:#fff;border-top:2px solid #1F2933">
+    <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:baseline">
+      <div>
+        <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#667085;font-weight:600">Tổng báo giá</div>
+        <div style="font-size:19px;font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums">{{ total }}</div>
+      </div>
+      <div style="font-size:12px;color:#667085">{{ changedLabel }}</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button type="button" onClick="{{ goEditor }}" style="flex:none;white-space:nowrap;min-height:40px;padding:11px 14px;background:#fff;border:1px solid #E4E9EE;color:#163A5F;cursor:pointer;font-size:13px;font-weight:600" style-hover="background:#EAF1F7">← Quote Editor</button>
+      <button type="button" onClick="{{ goCustomer }}" style="flex:none;white-space:nowrap;min-height:40px;padding:11px 14px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13px;font-weight:600" style-hover="background:#102E4D">Xem trang khách →</button>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 07 CUSTOMER CONSULTATION VIEW ══ -->
+<sc-if value="{{ isCustomer }}">
+  <div style="background:#fff">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px clamp(18px,5vw,64px);border-bottom:1px solid #E4E9EE">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#163A5F;white-space:nowrap">Nội Thất Studio</div>
+      <div style="font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#667085;white-space:nowrap">Phương án dành riêng cho bạn</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));min-height:min(56vh,470px)">
+      <div style="padding:clamp(34px,5vw,66px) clamp(18px,5vw,64px);display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <div style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#667085;font-weight:600">Phương án nội thất</div>
+        <div>
+          <div style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#667085;margin-bottom:14px">Dành cho</div>
+          <div style="font-size:clamp(34px,4.4vw,58px);line-height:1;font-weight:600;letter-spacing:-.02em">Nguyễn Văn A</div>
+          <div style="font-size:15px;color:#667085;margin-top:20px">Căn hộ • 75m² • Q.7, TP.HCM</div>
+        </div>
+        <div style="height:2px;background:#1F2933;max-width:120px"></div>
+        <div style="font-size:15.5px;line-height:1.7;max-width:31em;text-wrap:pretty">Ba không gian. Mỗi không gian có ba gói giải pháp, và trong mỗi gói bạn có thể chọn từng món — kiểu dáng, vật liệu, giá. Ngân sách cập nhật ngay theo lựa chọn của bạn.</div>
+        <div style="max-width:440px">
+          <sc-for list="{{ custIndex }}" as="c" hint-placeholder-count="3">
+            <button type="button" onClick="{{ c.go }}" style="display:flex;align-items:baseline;gap:14px;width:100%;text-align:left;padding:13px 0;border:0;border-bottom:1px solid #E4E9EE;background:transparent;cursor:pointer" style-hover="background:#EAF1F7">
+              <span style="font-size:11.5px;color:#667085;font-variant-numeric:tabular-nums;letter-spacing:.1em">{{ c.num }}</span>
+              <span style="flex:1;font-size:16.5px;font-weight:500">{{ c.name }}</span>
+              <span style="font-size:12.5px;color:#667085;white-space:nowrap">{{ c.tier }}</span>
+              <span style="font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap">{{ c.amount }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:block">
+        <image-slot id="cust-intro-hero" shape="rect" fit="cover" placeholder="Ảnh tổng quan công trình" src="{{ custHero }}" credit="{{ custHeroCredit }}" credit-href="{{ custHeroHref }}" style="display:block;width:100%;height:clamp(320px,40vw,470px)"></image-slot>
+      </div>
+    </div>
+
+    <div style="position:sticky;top:42px;z-index:40;background:#fff;border-top:2px solid #1F2933;border-bottom:1px solid #E4E9EE;padding:16px clamp(18px,5vw,64px) 0">
+      <div style="display:flex;flex-wrap:wrap;gap:clamp(16px,2.4vw,34px)">
+        <sc-for list="{{ custTabs }}" as="t" hint-placeholder-count="3">
+          <button type="button" onClick="{{ t.go }}" style="display:flex;align-items:baseline;gap:9px;padding:0 0 12px;border:0;border-bottom:2px solid {{ t.bd }};background:transparent;color:{{ t.fg }};cursor:pointer;white-space:nowrap" style-hover="color:#163A5F">
+            <span style="font-size:11px;opacity:.6;font-variant-numeric:tabular-nums;letter-spacing:.08em">{{ t.num }}</span>
+            <span style="font-size:15.5px;font-weight:{{ t.w }}">{{ t.name }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:stretch">
+      <div style="flex:1 1 560px;min-width:320px">
+        <sc-for list="{{ custRooms }}" as="r" hint-placeholder-count="1">
+          <div style="border-top:2px solid #1F2933;padding:clamp(36px,5vw,68px) clamp(18px,5vw,64px)">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(20px,3vw,40px);margin-bottom:clamp(30px,4vw,48px)">
+              <div>
+                <image-slot id="{{ r.heroId }}" shape="rect" fit="cover" placeholder="Ảnh không gian" src="{{ r.hero }}" credit="{{ r.heroCredit }}" credit-href="{{ r.heroHref }}" style="display:block;width:100%;height:clamp(240px,30vw,400px)"></image-slot>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
+                  <sc-for list="{{ r.thumbs }}" as="th" hint-placeholder-count="3">
+                    <image-slot id="{{ th.id }}" shape="rect" fit="cover" placeholder="{{ th.label }}" src="{{ th.src }}" credit="{{ th.credit }}" credit-href="{{ th.href }}" style="display:block;width:100%;height:92px"></image-slot>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px">
+                  <span style="font-size:12px;letter-spacing:.2em;color:#667085;font-variant-numeric:tabular-nums">{{ r.num }}</span>
+                  <span style="font-size:clamp(24px,2.8vw,34px);font-weight:600;line-height:1.05;letter-spacing:-.01em">{{ r.name }}</span>
+                </div>
+                <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin:16px 0 12px">Chọn mức đầu tư</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ r.tiers }}" as="t" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ t.go }}" style="display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:14px 16px;border:1px solid {{ t.cardBd }};background:{{ t.cardBg }};color:#1F2933;cursor:pointer" style-hover="border-color:#163A5F">
+                      <span style="width:18px;height:18px;flex:none;margin-top:2px;border:1px solid {{ t.boxBd }};background:{{ t.boxBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">{{ t.mark }}</span>
+                      <span style="flex:1;min-width:0">
+                        <span style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between">
+                          <span style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">{{ t.label }}</span>
+                          <span style="font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">{{ t.price }}</span>
+                        </span>
+                        <span style="display:block;font-size:12.5px;color:#667085;line-height:1.55;margin-top:6px;text-wrap:pretty">{{ t.note }}</span>
+                        <span style="display:block;font-size:11px;color:#667085;margin-top:4px">{{ t.count }}</span>
+                      </span>
+                    </button>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ r.edited }}">
+                  <button type="button" onClick="{{ r.reset }}" style="margin-top:12px;white-space:nowrap;padding:7px 11px;border:1px solid #163A5F;background:#EAF1F7;color:#163A5F;cursor:pointer;font-size:11.5px;font-weight:600">↺ Đặt lại theo gói</button>
+                </sc-if>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+              <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600">Hạng mục bao gồm — chọn chi tiết từng món</div>
+              <div style="font-size:11.5px;color:#667085;white-space:nowrap">{{ r.countLabel }}</div>
+            </div>
+            <div style="border-top:2px solid #1F2933">
+              <sc-for list="{{ r.items }}" as="it" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px clamp(20px,3vw,40px);padding:22px 0;border-bottom:1px solid #E4E9EE;background:{{ it.rowBg }}">
+                  <image-slot id="{{ it.slotId }}" shape="rect" fit="cover" placeholder="{{ it.slotHint }}" src="{{ it.slotSrc }}" credit="{{ it.slotCredit }}" credit-href="{{ it.slotHref }}" style="width:100%;height:180px;display:block"></image-slot>
+                  <div>
+                    <div style="display:flex;align-items:baseline;gap:10px">
+                      <span style="font-size:11px;color:#163A5F;font-weight:700;font-variant-numeric:tabular-nums">{{ it.num }}</span>
+                      <span style="font-size:17.5px;font-weight:600">{{ it.name }}</span>
+                    </div>
+                    <div style="font-size:12.5px;color:#667085;margin-top:6px;font-variant-numeric:tabular-nums">{{ it.size }}</div>
+                    <div style="font-size:13.5px;margin-top:8px">{{ it.spec }}</div>
+                    <button type="button" onClick="{{ it.toggle }}" style="margin-top:12px;border:0;background:transparent;padding:0;cursor:pointer;font-size:12px;color:#667085;white-space:nowrap;text-decoration:underline" style-hover="color:#163A5F">{{ it.toggleLabel }}</button>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Kiểu &amp; vật liệu</div>
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <sc-for list="{{ it.variants }}" as="v" hint-placeholder-count="3">
+                        <button type="button" onClick="{{ v.go }}" style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;width:100%;text-align:left;padding:11px 12px;border:1px solid {{ v.bd }};background:{{ v.bg }};color:{{ v.fg }};cursor:pointer">
+                          <span>
+                            <span style="display:block;font-size:13.5px;font-weight:600">{{ v.label }}</span>
+                            <span style="display:block;font-size:11.5px;opacity:.7;margin-top:2px">{{ v.spec }}</span>
+                          </span>
+                          <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">{{ v.price }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between;padding:24px 0;border-bottom:2px solid #1F2933">
+                <span style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#667085;font-weight:600">Tạm tính {{ r.name }}</span>
+                <span style="font-size:clamp(24px,3vw,34px);font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums;white-space:nowrap">{{ r.subtotal }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:26px clamp(18px,5vw,64px) clamp(40px,5vw,64px);border-top:1px solid #E4E9EE">
+          <sc-if value="{{ custHasPrev }}">
+            <button type="button" onClick="{{ custPrev }}" style="flex:none;white-space:nowrap;min-height:44px;padding:12px 16px;background:#fff;border:1px solid #E4E9EE;color:#667085;cursor:pointer;font-size:13px;font-weight:600" style-hover="background:#EAF1F7">← {{ custPrevLabel }}</button>
+          </sc-if>
+          <div style="flex:1"></div>
+          <sc-if value="{{ custHasNext }}">
+            <button type="button" onClick="{{ custNext }}" style="flex:none;white-space:nowrap;min-height:44px;padding:12px 18px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600" style-hover="background:#102E4D">{{ custNextLabel }} →</button>
+          </sc-if>
+          <sc-if value="{{ custIsLast }}">
+            <button type="button" onClick="{{ goSummary }}" style="flex:none;white-space:nowrap;min-height:44px;padding:12px 18px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:13.5px;font-weight:600" style-hover="background:#102E4D">Xem tổng kết →</button>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex:0 1 340px;min-width:280px;border-left:1px solid #E4E9EE;border-top:2px solid #1F2933">
+        <div style="position:sticky;top:96px;padding:clamp(20px,2.4vw,26px) clamp(20px,2.4vw,30px)">
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:16px">Tổng ngân sách dự kiến</div>
+          <div style="font-size:clamp(28px,3.2vw,38px);font-weight:700;color:#163A5F;line-height:1.05;font-variant-numeric:tabular-nums">{{ total }}</div>
+          <div style="font-size:12px;color:#667085;margin-top:8px">{{ totalRange }}</div>
+          <div style="display:flex;height:10px;margin:18px 0 12px">
+            <sc-for list="{{ budget }}" as="b" hint-placeholder-count="3">
+              <div style="flex:{{ b.grow }};min-width:2px;background:{{ b.color }};margin-right:2px"></div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ budget }}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid #E4E9EE">
+              <span style="width:8px;height:8px;flex:none;background:{{ b.color }}"></span>
+              <span style="flex:1;min-width:0;font-size:12.5px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.room }}</span>
+              <span style="font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap">{{ b.amount }}</span>
+            </div>
+          </sc-for>
+          <button type="button" onClick="{{ goSummary }}" style="width:100%;min-height:50px;margin-top:24px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:14px;font-weight:600;text-align:left;padding:14px 18px" style-hover="background:#102E4D">Xem tổng kết →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ 08 SUMMARY: CHI TIẾT → TỔNG ══ -->
+<sc-if value="{{ isSummary }}">
+  <div style="background:#fff;min-height:calc(100vh - 42px)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px clamp(18px,5vw,64px);border-bottom:1px solid #E4E9EE">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#163A5F;white-space:nowrap">Nội Thất Studio</div>
+      <button type="button" onClick="{{ goCustomer }}" style="flex:none;border:0;background:transparent;cursor:pointer;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#667085;font-weight:600;white-space:nowrap">← Quay lại phương án</button>
+    </div>
+
+    <sc-if value="{{ notConfirmed }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1000px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(18px,5vw,40px) 100px">
+        <div style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:16px">Nguyễn Văn A • Căn hộ 75m² • {{ itemCount }} hạng mục</div>
+        <div style="font-size:clamp(30px,4.4vw,56px);font-weight:600;line-height:1;letter-spacing:-.02em;margin-bottom:12px">Phương án của bạn</div>
+        <div style="font-size:15.5px;color:#667085;max-width:38em;text-wrap:pretty;margin-bottom:44px">Từ từng món nội thất, đến từng không gian, đến tổng mức đầu tư — toàn bộ con số được cộng lên như dưới đây.</div>
+
+        <!-- tổng + dải tỷ trọng -->
+        <div style="border-top:2px solid #1F2933;border-bottom:1px solid #E4E9EE;padding:30px 0 26px">
+          <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+            <div>
+              <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:10px">Tổng mức đầu tư dự kiến</div>
+              <div style="font-size:clamp(34px,5.4vw,64px);font-weight:700;color:#163A5F;line-height:1;font-variant-numeric:tabular-nums">{{ total }}</div>
+            </div>
+            <div style="font-size:13px;color:#667085;text-align:right">
+              <div>{{ totalRange }}</div>
+              <div style="margin-top:5px">{{ perM2 }}</div>
+            </div>
+          </div>
+          <div style="display:flex;height:20px;margin-top:26px">
+            <sc-for list="{{ budget }}" as="b" hint-placeholder-count="3">
+              <div style="flex:{{ b.grow }};min-width:4px;background:{{ b.color }};margin-right:2px"></div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:16px">
+            <sc-for list="{{ budget }}" as="b" hint-placeholder-count="3">
+              <div style="display:flex;align-items:baseline;gap:9px">
+                <span style="width:9px;height:9px;flex:none;background:{{ b.color }};margin-top:5px"></span>
+                <span style="flex:1;min-width:0">
+                  <span style="display:block;font-size:13.5px;font-weight:600">{{ b.room }}</span>
+                  <span style="display:block;font-size:12px;color:#667085;margin-top:2px;font-variant-numeric:tabular-nums">{{ b.amount }} • {{ b.pct }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- ladder: chi tiết từng phòng -->
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between;margin:44px 0 0">
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600">Chi tiết cấu thành</div>
+          <button type="button" onClick="{{ toggleDetail }}" style="flex:none;white-space:nowrap;padding:7px 12px;border:1px solid #163A5F;background:#fff;color:#163A5F;cursor:pointer;font-size:11.5px;font-weight:600" style-hover="background:#EAF1F7">{{ detailLabel }}</button>
+        </div>
+
+        <sc-for list="{{ ladder }}" as="r" hint-placeholder-count="3">
+          <div style="margin-top:26px">
+            <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid {{ r.color }}">
+              <div style="display:flex;align-items:baseline;gap:14px;min-width:0">
+                <span style="font-size:12px;color:#667085;font-variant-numeric:tabular-nums;letter-spacing:.1em">{{ r.num }}</span>
+                <span style="font-size:clamp(19px,2.2vw,26px);font-weight:600">{{ r.name }}</span>
+                <span style="display:inline-flex;flex:none;white-space:nowrap;padding:4px 9px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#EAF1F7;color:#163A5F">{{ r.tier }}</span>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:14px">
+                <span style="font-size:12px;color:#667085;font-variant-numeric:tabular-nums;white-space:nowrap">{{ r.pct }} tổng</span>
+                <span style="font-size:19px;font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums;white-space:nowrap">{{ r.subtotal }}</span>
+              </div>
+            </div>
+            <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <sc-for list="{{ r.items }}" as="it" hint-placeholder-count="6">
+                  <div style="display:grid;grid-template-columns:minmax(150px,1.3fr) minmax(150px,1.4fr) minmax(90px,1fr) minmax(110px,auto);gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #E4E9EE">
+                    <div style="font-size:14px;font-weight:500">{{ it.name }}</div>
+                    <div style="font-size:12.5px;color:#667085">{{ it.variant }}</div>
+                    <div style="height:6px;background:#EAF1F7">
+                      <div style="height:6px;background:{{ r.color }};width:{{ it.share }}"></div>
+                    </div>
+                    <div style="font-size:13.5px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">{{ it.price }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-top:40px;padding:28px 0;border-top:2px solid #1F2933;border-bottom:2px solid #1F2933">
+          <div>
+            <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:8px">Tổng cộng {{ itemCount }} hạng mục</div>
+            <div style="font-size:13px;color:#667085">{{ totalRange }}</div>
+          </div>
+          <div style="font-size:clamp(30px,4.4vw,52px);font-weight:700;color:#163A5F;line-height:1;font-variant-numeric:tabular-nums">{{ total }}</div>
+        </div>
+
+        <div style="font-size:13px;line-height:1.7;color:#667085;margin:24px 0 40px;max-width:46em;text-wrap:pretty">Mức giá trên mang tính chất tham khảo và có thể thay đổi tùy theo kích thước thực tế, vật liệu và yêu cầu cụ thể. Kích thước có thể điều chỉnh phù hợp với từng không gian.</div>
+        <button type="button" onClick="{{ confirm }}" style="min-height:54px;padding:16px 26px;background:#163A5F;color:#fff;border:0;cursor:pointer;font-size:15px;font-weight:600;text-align:left" style-hover="background:#102E4D">Xác nhận phương án</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ confirmed }}">
+      <div style="max-width:640px;margin:0 auto;padding:clamp(60px,10vw,140px) clamp(18px,5vw,40px)">
+        <div style="width:44px;height:2px;background:#163A5F;margin-bottom:34px"></div>
+        <div style="font-size:clamp(32px,4.6vw,56px);font-weight:600;line-height:1.02;letter-spacing:-.02em;margin-bottom:26px">Cảm ơn bạn.</div>
+        <div style="font-size:16.5px;line-height:1.75;margin-bottom:36px;text-wrap:pretty">Chúng tôi đã nhận được lựa chọn của bạn. Nhân viên tư vấn sẽ liên hệ để hoàn thiện báo giá chi tiết.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;padding:18px 0;border-top:1px solid #E4E9EE;border-bottom:2px solid #1F2933">
+          <span style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#667085;font-weight:600;white-space:nowrap">Tổng dự kiến</span>
+          <span style="font-size:20px;font-weight:700;color:#163A5F;font-variant-numeric:tabular-nums;white-space:nowrap">{{ total }}</span>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNav&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+class Component extends DCLogic {
+  state = {
+    view: 'list',
+    room: 'living',
+    tier: { living: 'standard', kitchen: 'premium', master: 'standard' },
+    picks: null,
+    priceOv: {},
+    extra: { living: [], kitchen: [], master: [] },
+    imgOv: {},
+    drawer: false,
+    draft: null,
+    copied: false,
+    confirmed: false,
+    filter: 'Tất cả',
+    tpl: 't1',
+    showDetail: true,
+    q: '',
+    custRoom: 'living',
+    textOv: {},
+    onlyUsed: false,
+    roomFilter: 'Tất cả',
+  };
+
+  IMG = {
+    living1: 'photo-1768609239321-1cfe14893e80',
+    living2: 'photo-1762544968153-b9b47435fefd',
+    living3: 'photo-1759238136854-a43787126db7',
+    kitchen1: 'photo-1764526624453-db32c24eca55',
+    bed1: 'photo-1757344454333-cc666252e596',
+    bed2: 'photo-1645334424307-6de7ff8f2f34',
+  };
+  u(k, w) { return 'https://images.unsplash.com/' + this.IMG[k] + '?w=' + w + '&q=80&auto=format&fit=crop'; }
+  CREDIT = {
+    living1: ['rawkkim', 'rawkkim'],
+    living2: ['Clay Banks', 'claybanks'],
+    living3: ['Franco Debartolo', 'francotheshooter'],
+    kitchen1: ['Clay Banks', 'claybanks'],
+    bed1: ['POOJAN THANEKAR', 'poojanclicks'],
+    bed2: ['MD Shahareyar Yunus', '7_arch'],
+  };
+  imgObj(k, w, id) {
+    const c = this.CREDIT[k] || ['Unsplash', ''];
+    return { id, src: this.u(k, w), credit: 'Photo by ' + c[0] + ' on Unsplash', href: 'https://unsplash.com/@' + c[1] };
+  }
+  slotImg(roomKey, n) {
+    const pool = this.imgs(roomKey);
+    const k = pool[n % pool.length];
+    const c = this.CREDIT[k] || ['Unsplash', ''];
+    return { src: this.u(k, 560), credit: 'Photo by ' + c[0] + ' on Unsplash', href: 'https://unsplash.com/@' + c[1] };
+  }
+
+  ORDER = ['living', 'kitchen', 'master'];
+  TIER_ORDER = ['basic', 'standard', 'premium'];
+  TIER_LABEL = { basic: 'Cơ bản', standard: 'Tiêu chuẩn', premium: 'Cao cấp' };
+  COLORS = { living: '#163A5F', kitchen: '#33648C', master: '#6C93B4' };
+
+  CAT = {
+    living: {
+      name: 'Phòng khách', imgs: ['living1', 'living2', 'living3'],
+      desc: {
+        basic: 'Đủ công năng cho sinh hoạt hằng ngày, ưu tiên chi phí hợp lý.',
+        standard: 'Bổ sung vách trang trí và hệ tủ — không gian hoàn thiện hơn rõ rệt.',
+        premium: 'Vật liệu tự nhiên, thiết kế chi tiết và hệ trang trí đầy đủ.',
+      },
+      items: [
+        { key: 'sofa', name: 'Sofa', size: '2200 × 850 × 700 mm', variants: [
+          { label: 'Vải bố xám', spec: 'Nệm mút D40, chân gỗ', price: 38000000 },
+          { label: 'Vải cao cấp', spec: 'Nệm D40 + lớp lông vũ', price: 42000000 },
+          { label: 'Da Microfiber', spec: 'Khung gỗ sồi, da công nghiệp', price: 56000000 }] },
+        { key: 'ban', name: 'Bàn sofa', size: 'ĐK 700 mm', variants: [
+          { label: 'Gỗ công nghiệp', spec: 'MDF phủ Melamine, chân sắt', price: 6500000 },
+          { label: 'Gỗ sồi', spec: 'Gỗ sồi kết hợp chân sắt', price: 8500000 },
+          { label: 'Mặt đá Ceramic', spec: 'Đá Ceramic, chân sơn tĩnh điện', price: 12500000 }] },
+        { key: 'ketivi', name: 'Kệ tivi', size: '1970 × 270 × 600 mm', variants: [
+          { label: 'MDF sơn trắng', spec: 'MDF chống ẩm, sơn phủ', price: 22000000 },
+          { label: 'MDF phủ veneer sồi', spec: 'Kết hợp sơn trắng', price: 24000000 },
+          { label: 'Gỗ tự nhiên', spec: 'Gỗ sồi nguyên tấm', price: 30000000 }] },
+        { key: 'kevach', name: 'Kệ trên kệ tivi', size: '2900 × 220 × 976 mm', variants: [
+          { label: 'MDF sơn trắng', spec: 'Sơn phủ 2 lớp', price: 10000000 },
+          { label: 'MDF phủ veneer sồi', spec: 'Kết hợp sơn trắng', price: 12000000 }] },
+        { key: 'vach', name: 'Vách trang trí', size: '2400 × 40 × 2600 mm', variants: [
+          { label: 'Lam gỗ nhựa', spec: 'Lam nhựa vân gỗ, khung nhôm', price: 12500000 },
+          { label: 'Lam gỗ tự nhiên', spec: 'Gỗ ASH thổi PU', price: 17000000 }] },
+        { key: 'tu', name: 'Hệ tủ trang trí', size: '1800 × 400 × 2400 mm', variants: [
+          { label: 'MDF Melamine E2', spec: 'Ray bi giảm chấn Vickini', price: 20000000 },
+          { label: 'MDF phủ veneer', spec: 'Bản lề giảm chấn, kịch trần', price: 25000000 }] },
+        { key: 'den', name: 'Đèn trang trí', size: 'Đèn thả 3 bóng', variants: [
+          { label: 'Nhôm sơn tĩnh điện', spec: 'LED 3000K', price: 6200000 },
+          { label: 'Đồng mạ', spec: 'LED 3000K, thân đồng', price: 10000000 }] },
+        { key: 'rem', name: 'Rèm cửa 2 lớp', size: 'Cao 2.6 m', variants: [
+          { label: 'Polyester 100% VN', spec: 'Voan + cản sáng', price: 8500000 },
+          { label: 'Blackout cao cấp', spec: 'Cản sáng 95%, ray êm', price: 12000000 }] },
+      ],
+      tiers: {
+        basic: { sofa: 0, ban: 0, ketivi: 0, den: 0, rem: 0 },
+        standard: { sofa: 1, ban: 1, ketivi: 1, vach: 0, tu: 0, den: 0, rem: 0 },
+        premium: { sofa: 2, ban: 2, ketivi: 2, kevach: 1, vach: 1, tu: 1, den: 1, rem: 1 },
+      },
+    },
+    kitchen: {
+      name: 'Phòng bếp', imgs: ['kitchen1', 'living3', 'living2'],
+      desc: {
+        basic: 'Hệ bếp gọn gàng, dễ vệ sinh, phù hợp gia đình nhỏ.',
+        standard: 'Tủ bếp thiết kế riêng theo mặt bằng, phụ kiện giảm chấn.',
+        premium: 'Vật liệu tự nhiên, phụ kiện nhập khẩu và bàn đảo trung tâm.',
+      },
+      items: [
+        { key: 'tubep', name: 'Tủ bếp trên + dưới', size: '3800 × 600 × 2500 mm', variants: [
+          { label: 'MDF chống ẩm Melamine', spec: 'Chuẩn E2, ray bi Vickini', price: 52000000 },
+          { label: 'MDF phủ Acrylic', spec: 'Bóng gương, chống ẩm', price: 68000000 },
+          { label: 'Gỗ sồi tự nhiên', spec: 'Sồi Mỹ, sơn PU', price: 82000000 }] },
+        { key: 'da', name: 'Đá mặt bếp', size: 'Dài 3.8 m', variants: [
+          { label: 'Đá nhân tạo', spec: 'Vân mây chống bám bẩn', price: 12000000 },
+          { label: 'Đá thạch anh', spec: 'Chống trầy, chịu nhiệt', price: 18000000 },
+          { label: 'Đá Marble', spec: 'Vân tự nhiên nhập khẩu', price: 22000000 }] },
+        { key: 'chau', name: 'Chậu & vòi rửa', size: 'Chậu 2 hố', variants: [
+          { label: 'Inox 304', spec: 'Vòi nóng lạnh cơ bản', price: 6500000 },
+          { label: 'Inox 304 + vòi rút', spec: 'Vòi dây rút, xoay 360°', price: 9500000 },
+          { label: 'Nhập khẩu Đức', spec: 'Chậu đá + vòi cảm ứng', price: 12000000 }] },
+        { key: 'phukien', name: 'Phụ kiện tủ bếp', size: 'Ray bi giảm chấn', variants: [
+          { label: 'Vickini', spec: 'Ray bi, bản lề giảm chấn', price: 8500000 },
+          { label: 'Blum nhập khẩu', spec: 'Ray êm, giá liên hoàn', price: 14000000 }] },
+        { key: 'banan', name: 'Bộ bàn ăn 4 ghế', size: '1200 × 800 mm', variants: [
+          { label: 'Gỗ ASH sơn PU', spec: 'Ghế gỗ, đệm vải', price: 14000000 },
+          { label: 'Mặt đá Ceramic', spec: 'Chân sắt sơn tĩnh điện, ghế bọc', price: 19000000 },
+          { label: 'Gỗ sồi tự nhiên', spec: 'Ghế bọc da công nghiệp', price: 24000000 }] },
+        { key: 'tugiay', name: 'Tủ giày', size: '900 × 350 × 1000 mm', variants: [
+          { label: 'MDF Melamine', spec: 'Chống ẩm, cánh phẳng', price: 7500000 },
+          { label: 'Veneer sồi', spec: 'Kết hợp sơn trắng', price: 10000000 }] },
+        { key: 'dao', name: 'Bàn đảo', size: '1600 × 800 × 900 mm', variants: [
+          { label: 'MDF + mặt đá', spec: 'Đá nhân tạo, hộc kéo', price: 20000000 }] },
+        { key: 'den', name: 'Đèn thả bàn ăn', size: '3 bóng', variants: [
+          { label: 'Nhôm sơn tĩnh điện', spec: 'LED 3000K', price: 4500000 },
+          { label: 'Thủy tinh nhập khẩu', spec: 'Thân đồng, LED 3000K', price: 7000000 }] },
+      ],
+      tiers: {
+        basic: { tubep: 0, da: 0, chau: 0, phukien: 0, banan: 0 },
+        standard: { tubep: 1, da: 1, chau: 1, phukien: 0, banan: 1, tugiay: 0, den: 0 },
+        premium: { tubep: 2, da: 2, chau: 2, phukien: 1, banan: 2, tugiay: 1, dao: 0, den: 1 },
+      },
+    },
+    master: {
+      name: 'Phòng ngủ Master', imgs: ['bed1', 'bed2', 'living2'],
+      desc: {
+        basic: 'Trọn bộ ngủ nghỉ cơ bản, tối ưu diện tích.',
+        standard: 'Tủ áo kịch trần, đầu giường ốp và rèm hai lớp.',
+        premium: 'Hoàn thiện cao cấp toàn bộ, hệ đèn và rèm tự động.',
+      },
+      items: [
+        { key: 'giuong', name: 'Giường ngủ', size: '2.0 m × 1.6 m', variants: [
+          { label: 'Gỗ công nghiệp', spec: 'MDF Melamine, tăng đơ', price: 16000000 },
+          { label: 'Bọc nệm vải', spec: 'Khung gỗ, nệm mút D40', price: 19000000 },
+          { label: 'Gỗ sồi tự nhiên', spec: 'Sồi Mỹ, sơn PU', price: 28000000 }] },
+        { key: 'tuquanao', name: 'Tủ quần áo', size: '1.6 m × 2.8 m', variants: [
+          { label: 'MDF Melamine', spec: 'Cánh phẳng, ray bi', price: 28000000 },
+          { label: 'Kịch trần', spec: 'MDF Melamine, kịch trần', price: 34000000 },
+          { label: 'Cánh kính khung nhôm', spec: 'Kính mờ, đèn cảm ứng', price: 46000000 }] },
+        { key: 'tab', name: 'Tủ đầu giường', size: '450 × 450 mm (2 cái)', variants: [
+          { label: 'MDF Melamine', spec: '2 hộc kéo giảm chấn', price: 5500000 },
+          { label: 'Veneer sồi', spec: 'Sơn PU, tay âm', price: 7500000 }] },
+        { key: 'trangdiem', name: 'Bàn trang điểm + tivi', size: 'Dài 2.0 m', variants: [
+          { label: 'MDF Melamine', spec: 'Gương thường, 2 hộc', price: 11000000 },
+          { label: 'Veneer + gương LED', spec: 'Gương LED cảm ứng', price: 16000000 }] },
+        { key: 'opdau', name: 'Ốp đầu giường', size: '2600 × 2600 mm', variants: [
+          { label: 'Nỉ bọc', spec: 'Nỉ chống bám bụi', price: 9000000 },
+          { label: 'Ốp gỗ veneer', spec: 'Veneer sồi + nỉ', price: 15000000 }] },
+        { key: 'den', name: 'Hệ đèn trang trí', size: 'Đèn hắt + đèn ngủ', variants: [
+          { label: 'LED cơ bản', spec: 'Hắt trần, 3000K', price: 5000000 },
+          { label: 'Đèn thả + hắt trần', spec: 'Đèn ngủ 2 bên, dimmer', price: 9000000 }] },
+        { key: 'rem', name: 'Rèm cửa 2 lớp', size: 'Cao 2.6 m', variants: [
+          { label: 'Polyester 100% VN', spec: 'Voan + cản sáng', price: 7500000 },
+          { label: 'Blackout tự động', spec: 'Motor điều khiển từ xa', price: 13000000 }] },
+      ],
+      tiers: {
+        basic: { giuong: 0, tuquanao: 0, tab: 0, rem: 0, den: 0 },
+        standard: { giuong: 1, tuquanao: 1, tab: 1, trangdiem: 0, opdau: 0, rem: 0, den: 0 },
+        premium: { giuong: 2, tuquanao: 2, tab: 1, trangdiem: 1, opdau: 1, den: 1, rem: 1 },
+      },
+    },
+  };
+
+  QUOTES = [
+    { code: 'Q-0004', name: 'Phạm Thu D', project: 'Căn hộ • 62m²', range: '210 triệu', date: '26.08.2026', status: 'Draft' },
+    { code: 'Q-0001', name: 'Nguyễn Văn A', project: 'Căn hộ • 75m²', range: '405 triệu', date: '21.08.2026', status: 'Đang tư vấn' },
+    { code: 'Q-0002', name: 'Trần Thị B', project: 'Biệt thự • 250m²', range: '1.32 tỷ', date: '14.08.2026', status: 'Khách đã gửi lựa chọn' },
+    { code: 'Q-0003', name: 'Lê Văn C', project: 'Nhà phố • 120m²', range: '680 triệu', date: '02.08.2026', status: 'Đã chốt' },
+  ];
+  TEMPLATES = [
+    { id: 't1', name: 'Căn hộ 2PN – Modern', rooms: 3, options: 9, range: '500 – 700 triệu', used: '12 báo giá', img: 'living1' },
+    { id: 't2', name: 'Căn hộ 3PN – Minimal', rooms: 4, options: 12, range: '700 – 900 triệu', used: '7 báo giá', img: 'bed2' },
+    { id: 't3', name: 'Biệt thự – Premium', rooms: 6, options: 18, range: '1.2 – 1.5 tỷ', used: '3 báo giá', img: 'living3' },
+  ];
+  NAV = [
+    ['01', 'Login', 'login'], ['02', 'Quote List', 'list'], ['03', 'Create', 'create'],
+    ['04', 'Quote Editor', 'editor'], ['05', 'Templates', 'templates'], ['06', 'Template Editor', 'tplEditor'],
+    ['07', 'Customer View', 'customer'], ['08', 'Tổng kết', 'summary'],
+    ['09', 'Giá & hình ảnh', 'prices'],
+  ];
+
+  setPrice(roomKey, key, vi, val) {
+    this.setState(s => ({ priceOv: Object.assign({}, s.priceOv, { [roomKey + '/' + key + '/' + vi]: Math.max(0, Math.round(Number(val) || 0)) }) }));
+  }
+  clearPrice(roomKey, key, vi) {
+    this.setState(s => {
+      const ov = Object.assign({}, s.priceOv);
+      delete ov[roomKey + '/' + key + '/' + vi];
+      return { priceOv: ov };
+    });
+  }
+  scaleRoom(roomKey, f) {
+    return () => this.setState(s => {
+      const ov = Object.assign({}, s.priceOv);
+      this.CAT[roomKey].items.forEach(i => i.variants.forEach((v, vi) => {
+        const k = roomKey + '/' + i.key + '/' + vi;
+        const cur = ov[k] != null ? ov[k] : v.price;
+        ov[k] = Math.round(cur * f / 100000) * 100000;
+      }));
+      return { priceOv: ov };
+    });
+  }
+  resetRoomPrices(roomKey) {
+    return () => this.setState(s => {
+      const ov = {};
+      Object.keys(s.priceOv).forEach(k => { if (k.indexOf(roomKey + '/') !== 0) ov[k] = s.priceOv[k]; });
+      return { priceOv: ov };
+    });
+  }
+
+  // ── money ──
+  vnd(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' đ'; }
+  tr(n) {
+    const v = n / 1000000;
+    const s = (Math.round(v * 10) / 10).toFixed(1).replace('.', ',').replace(',0', '');
+    return s + ' triệu';
+  }
+
+  picksOf(roomKey) {
+    const p = this.state.picks;
+    if (p && p[roomKey]) return p[roomKey];
+    return this.CAT[roomKey].tiers[this.state.tier[roomKey]];
+  }
+  itemDef(roomKey, key) { return this.CAT[roomKey].items.filter(i => i.key === key)[0]; }
+  txt(k, dflt) { const v = this.state.textOv[k]; return v != null ? v : dflt; }
+  nameOf(r, key) { const d = this.itemDef(r, key); return this.txt(r + '/' + key + '/name', d ? d.name : ''); }
+  sizeOf(r, key) { const d = this.itemDef(r, key); return this.txt(r + '/' + key + '/size', d ? d.size : ''); }
+  labelOf(r, key, vi) { const d = this.itemDef(r, key); return this.txt(r + '/' + key + '/' + vi + '/label', d ? d.variants[vi].label : ''); }
+  specOf(r, key, vi) { const d = this.itemDef(r, key); return this.txt(r + '/' + key + '/' + vi + '/spec', d ? d.variants[vi].spec : ''); }
+  setText(k, val) { this.setState(s => ({ textOv: Object.assign({}, s.textOv, { [k]: val }) })); }
+  price(roomKey, key, vi) {
+    const ov = this.state.priceOv[roomKey + '/' + key + '/' + vi];
+    if (ov != null) return ov;
+    const d = this.itemDef(roomKey, key);
+    return d ? d.variants[vi].price : 0;
+  }
+  lines(roomKey) {
+    const picks = this.picksOf(roomKey);
+    const out = this.CAT[roomKey].items.filter(i => picks[i.key] != null).map(i => {
+      const vi = picks[i.key];
+      return { key: i.key, name: this.nameOf(roomKey, i.key), size: this.sizeOf(roomKey, i.key), def: i, vi, variant: this.labelOf(roomKey, i.key, vi), spec: this.specOf(roomKey, i.key, vi), price: this.price(roomKey, i.key, vi) };
+    });
+    this.state.extra[roomKey].forEach((e, n) => {
+      out.push({ key: 'x' + n, name: e.name, size: 'Hạng mục thêm', def: null, vi: 0, variant: 'Theo yêu cầu', spec: '', price: e.price, extra: n });
+    });
+    return out;
+  }
+  subtotal(roomKey) { return this.lines(roomKey).reduce((a, l) => a + l.price, 0); }
+  grand() { return this.ORDER.reduce((a, k) => a + this.subtotal(k), 0); }
+  tierPrice(roomKey, tk) {
+    const t = this.CAT[roomKey].tiers[tk];
+    return Object.keys(t).reduce((a, k) => a + this.price(roomKey, k, t[k]), 0);
+  }
+  imgs(roomKey) { return this.state.imgOv[roomKey] || this.CAT[roomKey].imgs; }
+
+  ensure(roomKey) {
+    const p = this.state.picks ? Object.assign({}, this.state.picks) : {};
+    if (!p[roomKey]) p[roomKey] = Object.assign({}, this.CAT[roomKey].tiers[this.state.tier[roomKey]]);
+    return p;
+  }
+  setTier(roomKey, tk) {
+    return () => this.setState(s => {
+      const p = Object.assign({}, s.picks || {});
+      p[roomKey] = Object.assign({}, this.CAT[roomKey].tiers[tk]);
+      return { tier: Object.assign({}, s.tier, { [roomKey]: tk }), picks: p, extra: Object.assign({}, s.extra, { [roomKey]: [] }) };
+    });
+  }
+  setVariant(roomKey, key, vi) {
+    return () => {
+      const p = this.ensure(roomKey);
+      p[roomKey] = Object.assign({}, p[roomKey], { [key]: vi });
+      this.setState({ picks: p });
+    };
+  }
+  toggleItem(roomKey, key, on, extraIdx) {
+    return () => {
+      if (extraIdx != null) {
+        return this.setState(s => ({ extra: Object.assign({}, s.extra, { [roomKey]: s.extra[roomKey].filter((_, i) => i !== extraIdx) }) }));
+      }
+      const p = this.ensure(roomKey);
+      const next = Object.assign({}, p[roomKey]);
+      if (on) delete next[key]; else next[key] = 0;
+      p[roomKey] = next;
+      this.setState({ picks: p });
+    };
+  }
+  resetRoom(roomKey) {
+    return () => this.setState(s => {
+      const p = Object.assign({}, s.picks || {});
+      delete p[roomKey];
+      return { picks: p, extra: Object.assign({}, s.extra, { [roomKey]: [] }) };
+    });
+  }
+  edited(roomKey) {
+    const base = this.CAT[roomKey].tiers[this.state.tier[roomKey]];
+    const cur = this.picksOf(roomKey);
+    if (this.state.extra[roomKey].length) return true;
+    const a = Object.keys(base).sort().join(','), b = Object.keys(cur).sort().join(',');
+    if (a !== b) return true;
+    return Object.keys(base).some(k => base[k] !== cur[k]);
+  }
+
+  go(view) { return () => this.setState({ view, drawer: false, copied: false }); }
+
+  openDrawer = () => {
+    const rk = this.state.room;
+    this.setState({ drawer: true, draft: { items: this.lines(rk).map(l => ({ key: l.key, name: l.name, variant: l.variant, vi: l.vi, price: l.price, extra: l.extra })), images: this.imgs(rk).slice(), newItem: '', newPrice: '' } });
+  };
+  closeDrawer = () => this.setState({ drawer: false });
+  patchDraft(p) { this.setState(s => ({ draft: Object.assign({}, s.draft, p) })); }
+  saveDraft = () => {
+    const rk = this.state.room, dr = this.state.draft;
+    const ov = Object.assign({}, this.state.priceOv);
+    const keep = {};
+    const extra = [];
+    dr.items.forEach(it => {
+      if (it.extra != null) { extra.push({ name: it.name, price: Number(it.price) || 0 }); return; }
+      keep[it.key] = it.vi;
+      ov[rk + '/' + it.key + '/' + it.vi] = Number(it.price) || 0;
+    });
+    const p = Object.assign({}, this.state.picks || {});
+    p[rk] = keep;
+    this.setState(s => ({
+      priceOv: ov, picks: p, drawer: false,
+      imgOv: Object.assign({}, s.imgOv, { [rk]: dr.images.slice() }),
+      extra: Object.assign({}, s.extra, { [rk]: extra }),
+    }));
+  };
+
+  statusColor(st) {
+    if (st === 'Đã chốt') return ['#163A5F', '#fff', '#163A5F'];
+    if (st === 'Khách đã gửi lựa chọn') return ['#EAF1F7', '#163A5F', '#163A5F'];
+    if (st === 'Draft') return ['#F7F7F5', '#667085', '#E4E9EE'];
+    return ['#fff', '#163A5F', '#163A5F'];
+  }
+
+  tierBtns(roomKey) {
+    const sel = this.state.tier[roomKey];
+    return this.TIER_ORDER.map(tk => {
+      const on = tk === sel, n = Object.keys(this.CAT[roomKey].tiers[tk]).length;
+      return {
+        label: this.TIER_LABEL[tk], price: this.vnd(this.tierPrice(roomKey, tk)), count: n + ' hạng mục',
+        note: this.CAT[roomKey].desc[tk], go: this.setTier(roomKey, tk),
+        bg: on ? '#163A5F' : '#fff', fg: on ? '#fff' : '#1F2933', bd: on ? '#163A5F' : '#E4E9EE',
+        cardBg: on ? '#EAF1F7' : '#fff', cardBd: on ? '#163A5F' : '#E4E9EE',
+        boxBg: on ? '#163A5F' : '#fff', boxBd: on ? '#163A5F' : '#E4E9EE', mark: on ? '✓' : '',
+      };
+    });
+  }
+  itemRows(roomKey, rich) {
+    const picks = this.picksOf(roomKey);
+    const rows = this.CAT[roomKey].items.map((i, n) => {
+      const on = picks[i.key] != null, vi = on ? picks[i.key] : null;
+      const si = this.slotImg(roomKey, n);
+      return {
+        num: '0' + (n + 1), name: this.nameOf(roomKey, i.key), size: this.sizeOf(roomKey, i.key),
+        slotId: 'sl-' + roomKey + '-' + i.key, slotHint: i.name + ' — ' + i.size,
+        slotSrc: si.src, slotCredit: si.credit, slotHref: si.href,
+        spec: on ? this.specOf(roomKey, i.key, vi) : 'Chưa có trong phương án',
+        price: on ? this.vnd(this.price(roomKey, i.key, vi)) : '—',
+        rowBg: on ? '#fff' : '#F7F7F5',
+        toggle: this.toggleItem(roomKey, i.key, on),
+        toggleLabel: on ? '✕ Bỏ hạng mục này' : '+ Thêm vào phương án',
+        variants: i.variants.map((v, vn) => {
+          const act = on && vn === vi;
+          return {
+            label: this.labelOf(roomKey, i.key, vn), spec: this.specOf(roomKey, i.key, vn), price: this.vnd(this.price(roomKey, i.key, vn)),
+            go: this.setVariant(roomKey, i.key, vn),
+            bg: act ? '#163A5F' : '#fff', fg: act ? '#fff' : '#1F2933', bd: act ? '#163A5F' : '#E4E9EE',
+          };
+        }),
+      };
+    });
+    this.state.extra[roomKey].forEach((e, n) => rows.push({
+      num: '+', name: e.name, size: 'Hạng mục thêm', spec: 'Theo yêu cầu riêng', price: this.vnd(e.price), rowBg: '#fff',
+      slotId: 'sl-' + roomKey + '-x' + n, slotHint: e.name,
+      slotSrc: this.slotImg(roomKey, n).src, slotCredit: this.slotImg(roomKey, n).credit, slotHref: this.slotImg(roomKey, n).href,
+      toggle: this.toggleItem(roomKey, null, true, n), toggleLabel: '✕ Bỏ hạng mục này', variants: [],
+    }));
+    return rows;
+  }
+
+  renderVals() {
+    const s = this.state, v = s.view;
+    const isEditor = v === 'editor' || v === 'tplEditor';
+    const rk = s.room, C = this.CAT[rk];
+    const total = this.grand();
+    const lo = Math.round(total * 0.94 / 1000000), hi = Math.round(total * 1.08 / 1000000);
+
+    const budget = this.ORDER.map(k => {
+      const st = this.subtotal(k);
+      return {
+        room: this.CAT[k].name, tier: this.TIER_LABEL[s.tier[k]], amount: this.vnd(st),
+        pct: (total ? Math.round(st / total * 100) : 0) + '%', grow: total ? st / total : 1,
+        color: this.COLORS[k],
+      };
+    });
+
+    const itemCount = this.ORDER.reduce((a, k) => a + this.lines(k).length, 0);
+    const ci = this.ORDER.indexOf(s.custRoom);
+    const variantCount = this.ORDER.reduce((a, k) => a + this.CAT[k].items.reduce((b, i) => b + i.variants.length, 0), 0);
+    const changed = Object.keys(s.priceOv).length;
+    const q = (s.q || '').trim().toLowerCase();
+    const match = (i, rk) => {
+      if (!q) return true;
+      const parts = [i.name, i.size, this.nameOf(rk, i.key), this.sizeOf(rk, i.key)];
+      i.variants.forEach((x, vi) => parts.push(x.label, x.spec, this.labelOf(rk, i.key, vi), this.specOf(rk, i.key, vi)));
+      return parts.join(' ').toLowerCase().indexOf(q) >= 0;
+    };
+    const priceRooms = this.ORDER.map((k, ri) => {
+      const picks = this.picksOf(k);
+      const items = this.CAT[k].items
+        .map((i, n) => ({ i, n }))
+        .filter(o => match(o.i, k))
+        .filter(o => !s.onlyUsed || picks[o.i.key] != null)
+        .map(o => {
+          const i = o.i, si = this.slotImg(k, o.n), on = picks[i.key] != null;
+          return {
+            name: this.nameOf(k, i.key), size: this.sizeOf(k, i.key), rowBg: on ? '#fff' : '#F7F7F5',
+            setName: e => this.setText(k + '/' + i.key + '/name', e.target.value),
+            setSize: e => this.setText(k + '/' + i.key + '/size', e.target.value),
+            slotId: 'sl-' + k + '-' + i.key, slotSrc: si.src, slotCredit: si.credit, slotHref: si.href,
+            useLabel: on ? '● Có trong phương án hiện tại' : '○ Chưa dùng trong phương án',
+            variants: i.variants.map((vv, vi) => {
+              const key = k + '/' + i.key + '/' + vi;
+              const ovd = s.priceOv[key] != null;
+              const p = this.price(k, i.key, vi);
+              const act = on && picks[i.key] === vi;
+              return {
+                label: this.labelOf(k, i.key, vi), spec: this.specOf(k, i.key, vi), price: p, tr: this.tr(p),
+                setLabel: e => this.setText(k + '/' + i.key + '/' + vi + '/label', e.target.value),
+                setSpec: e => this.setText(k + '/' + i.key + '/' + vi + '/spec', e.target.value),
+                active: act, w: act ? 600 : 500,
+                bg: ovd ? '#EAF1F7' : '#fff', bd: ovd ? '#163A5F' : '#E4E9EE',
+                resetFg: ovd ? '#163A5F' : '#E4E9EE',
+                set: e => this.setPrice(k, i.key, vi, e.target.value),
+                reset: () => this.clearPrice(k, i.key, vi),
+              };
+            }),
+          };
+        });
+      return {
+        key: k, num: '0' + (ri + 1), name: this.CAT[k].name, color: this.COLORS[k],
+        count: items.length + ' / ' + this.CAT[k].items.length + ' hạng mục',
+        subtotal: this.vnd(this.subtotal(k)), items,
+        bump: this.scaleRoom(k, 1.05), cut: this.scaleRoom(k, 0.95), reset: this.resetRoomPrices(k),
+      };
+    }).filter(r => r.items.length > 0 && (s.roomFilter === 'Tất cả' || s.roomFilter === r.name));
+
+    return {
+      showNav: this.props.showNav ?? true,
+      isLogin: v === 'login', isList: v === 'list', isCreate: v === 'create',
+      isTemplates: v === 'templates', isEditor, isQuoteEditor: v === 'editor',
+      isTemplateEditor: v === 'tplEditor', isCustomer: v === 'customer', isSummary: v === 'summary',
+      isPrices: v === 'prices',
+      isAdmin: ['list', 'create', 'editor', 'templates', 'tplEditor', 'prices'].indexOf(v) >= 0,
+      notConfirmed: v === 'summary' && !s.confirmed, confirmed: s.confirmed,
+
+      nav: this.NAV.map(n => ({
+        num: n[0], label: n[1], go: this.go(n[2]),
+        bg: v === n[2] ? '#fff' : 'transparent', fg: v === n[2] ? '#163A5F' : 'rgba(255,255,255,.82)',
+      })),
+      adminTabs: [
+        { label: 'Báo giá', go: this.go('list'), on: ['list', 'create', 'editor'].indexOf(v) >= 0 },
+        { label: 'Templates', go: this.go('templates'), on: ['templates', 'tplEditor'].indexOf(v) >= 0 },
+        { label: 'Giá & hình ảnh', go: this.go('prices'), on: v === 'prices' },
+      ].map(t => ({ label: t.label, go: t.go, w: t.on ? 600 : 500, fg: t.on ? '#163A5F' : '#667085', bd: t.on ? '#163A5F' : 'transparent' })),
+
+      goList: this.go('list'), goCreate: this.go('create'), goEditor: this.go('editor'),
+      goTemplates: this.go('templates'), goTemplateEditor: this.go('tplEditor'),
+      goCustomer: () => this.setState({ view: 'customer', confirmed: false, custRoom: this.state.room }),
+      goSummary: this.go('summary'),
+      goPricesRoom: () => this.setState({ view: 'prices', roomFilter: this.CAT[this.state.room].name, q: '', onlyUsed: false, drawer: false }),
+      confirm: () => this.setState({ confirmed: true }),
+      toggleDetail: () => this.setState(st => ({ showDetail: !st.showDetail })),
+      showDetail: s.showDetail,
+      detailLabel: s.showDetail ? 'Ẩn chi tiết hạng mục' : 'Xem chi tiết hạng mục',
+
+      quotes: this.QUOTES.map(q => {
+        const c = this.statusColor(q.status);
+        return Object.assign({}, q, { go: this.go('editor'), stBg: c[0], stFg: c[1], stBd: c[2] });
+      }),
+      filters: ['Tất cả', 'Draft', 'Đang tư vấn', 'Đã chốt'].map(f => ({
+        label: f, go: () => this.setState({ filter: f }),
+        bg: s.filter === f ? '#163A5F' : '#fff', fg: s.filter === f ? '#fff' : '#667085',
+        bd: s.filter === f ? '#163A5F' : '#E4E9EE',
+      })),
+      templatePicks: this.TEMPLATES.map(t => ({
+        name: t.name, meta: t.rooms + ' phòng • ' + t.options + ' phương án', range: t.range,
+        go: () => this.setState({ tpl: t.id }),
+        dot: s.tpl === t.id ? '#163A5F' : 'transparent', dotBd: s.tpl === t.id ? '#163A5F' : '#E4E9EE',
+      })),
+      templateRows: this.TEMPLATES.map(t => ({
+        name: t.name, meta: t.rooms + ' phòng • ' + t.options + ' phương án', range: t.range,
+        used: t.used, img: this.u(t.img, 320), slotId: 'tpl-' + t.id,
+        credit: this.imgObj(t.img, 320).credit, href: this.imgObj(t.img, 320).href, go: this.go('tplEditor'),
+      })),
+
+      quoteCode: 'Q-0001',
+      railTitle: v === 'tplEditor' ? 'Khoảng giá template' : 'Ngân sách dự kiến',
+      roomNav: this.ORDER.map((k, i) => ({
+        num: '0' + (i + 1), name: this.CAT[k].name,
+        sub: this.TIER_LABEL[s.tier[k]] + ' • ' + this.tr(this.subtotal(k)),
+        go: () => this.setState({ room: k }),
+        bg: k === rk ? '#EAF1F7' : 'transparent', bd: k === rk ? '#163A5F' : 'transparent',
+      })),
+      room: {
+        name: C.name, num: '0' + (this.ORDER.indexOf(rk) + 1),
+        tierLabel: this.TIER_LABEL[s.tier[rk]], subtotal: this.vnd(this.subtotal(rk)),
+        images: this.imgs(rk).map((k, i) => this.imgObj(k, 640, 'ed-' + rk + '-' + i)),
+        countLabel: this.lines(rk).length + ' hạng mục đã chọn',
+      },
+      tiers: this.tierBtns(rk),
+      roomItems: this.itemRows(rk),
+      budget, total: this.vnd(total),
+      totalRange: 'Khoảng dự kiến ' + lo + ' – ' + hi + ' triệu',
+      perM2: this.vnd(Math.round(total / 75)) + ' / m²',
+      itemCount,
+
+      drawer: s.drawer,
+      draft: s.draft ? {
+        newItem: s.draft.newItem, newPrice: s.draft.newPrice,
+        items: s.draft.items.map((it, i) => ({
+          name: it.name, variant: it.variant, price: it.price,
+          setPrice: e => this.patchDraft({ items: s.draft.items.map((x, j) => j === i ? Object.assign({}, x, { price: e.target.value }) : x) }),
+          remove: () => this.patchDraft({ items: s.draft.items.filter((_, j) => j !== i) }),
+        })),
+        images: s.draft.images.map((k, i) => ({
+          src: this.u(k, 240), id: 'ed-' + rk + '-' + i, credit: this.imgObj(k, 240).credit, href: this.imgObj(k, 240).href, label: 'image-' + (i + 1) + '.jpg',
+          remove: () => this.patchDraft({ images: s.draft.images.filter((_, j) => j !== i) }),
+        })),
+      } : { items: [], images: [], newItem: '', newPrice: '' },
+      openDrawer: this.openDrawer, closeDrawer: this.closeDrawer, saveDraft: this.saveDraft,
+      setNewItem: e => this.patchDraft({ newItem: e.target.value }),
+      setNewPrice: e => this.patchDraft({ newPrice: e.target.value }),
+      addItem: () => {
+        const n = (s.draft.newItem || '').trim();
+        if (!n) return;
+        this.patchDraft({
+          items: s.draft.items.concat([{ key: 'x', name: n, variant: 'Theo yêu cầu', vi: 0, price: Number(s.draft.newPrice) || 0, extra: s.draft.items.length }]),
+          newItem: '', newPrice: '',
+        });
+      },
+      addImage: () => {
+        const pool = Object.keys(this.IMG);
+        this.patchDraft({ images: s.draft.images.concat([pool[s.draft.images.length % pool.length]]) });
+      },
+      copyLabel: s.copied ? '✓ Đã sao chép link' : 'Sao chép link',
+      copyLink: () => this.setState({ copied: true }),
+      finalize: () => this.setState({ view: 'summary', confirmed: true }),
+
+      custHero: this.u('living1', 1400),
+      custHeroCredit: this.imgObj('living1', 1400).credit,
+      custHeroHref: this.imgObj('living1', 1400).href,
+      custIndex: this.ORDER.map((k, i) => ({
+        num: '0' + (i + 1), name: this.CAT[k].name, tier: this.TIER_LABEL[s.tier[k]],
+        amount: this.tr(this.subtotal(k)), go: () => this.setState({ custRoom: k }),
+      })),
+      custTabs: this.ORDER.map((k, i) => {
+        const on = k === s.custRoom;
+        return {
+          num: '0' + (i + 1), name: this.CAT[k].name, tier: this.TIER_LABEL[s.tier[k]],
+          amount: this.tr(this.subtotal(k)),
+          go: () => this.setState({ custRoom: k }),
+          bg: on ? '#EAF1F7' : '#fff', fg: on ? '#163A5F' : '#667085', w: on ? 600 : 500,
+          bd: on ? '#163A5F' : 'transparent',
+        };
+      }),
+      custHasPrev: ci > 0,
+      custHasNext: ci < this.ORDER.length - 1,
+      custIsLast: ci === this.ORDER.length - 1,
+      custPrevLabel: ci > 0 ? this.CAT[this.ORDER[ci - 1]].name : '',
+      custNextLabel: ci < this.ORDER.length - 1 ? this.CAT[this.ORDER[ci + 1]].name : '',
+      custPrev: () => this.setState({ custRoom: this.ORDER[Math.max(0, ci - 1)] }),
+      custNext: () => this.setState({ custRoom: this.ORDER[Math.min(this.ORDER.length - 1, ci + 1)] }),
+      custRooms: this.ORDER.filter(k => k === s.custRoom).map(k => ({
+        num: '0' + (this.ORDER.indexOf(k) + 1), name: this.CAT[k].name, hero: this.u(this.imgs(k)[0], 1400),
+        thumbs: this.imgs(k).map((ik, n) => Object.assign(this.imgObj(ik, 420, 'cust-thumb-' + k + '-' + n), { label: 'ảnh ' + (n + 1) })),
+        heroId: 'cust-hero-' + k, heroCredit: this.imgObj(this.imgs(k)[0], 1400).credit, heroHref: this.imgObj(this.imgs(k)[0], 1400).href,
+        tiers: this.tierBtns(k), desc: this.CAT[k].desc[s.tier[k]],
+        items: this.itemRows(k, true), subtotal: this.vnd(this.subtotal(k)),
+        countLabel: this.lines(k).length + ' hạng mục đã chọn',
+        edited: this.edited(k), reset: this.resetRoom(k),
+      })),
+
+      imagesReady: true,
+      query: s.q,
+      setQuery: e => this.setState({ q: e.target.value }),
+      toggleUsed: () => this.setState(st => ({ onlyUsed: !st.onlyUsed })),
+      usedLabel: s.onlyUsed ? '✓ Chỉ hạng mục đang dùng' : 'Chỉ hạng mục đang dùng',
+      usedBg: s.onlyUsed ? '#163A5F' : '#fff', usedFg: s.onlyUsed ? '#fff' : '#667085',
+      usedBd: s.onlyUsed ? '#163A5F' : '#E4E9EE',
+      roomFilters: ['Tất cả'].concat(this.ORDER.map(k => this.CAT[k].name)).map(f => ({
+        label: f, go: () => this.setState({ roomFilter: f }),
+        bg: s.roomFilter === f ? '#163A5F' : '#fff', fg: s.roomFilter === f ? '#fff' : '#667085',
+        bd: s.roomFilter === f ? '#163A5F' : '#E4E9EE',
+      })),
+      priceStats: this.ORDER.length + ' phòng • ' + this.ORDER.reduce((a, k) => a + this.CAT[k].items.length, 0) + ' hạng mục • ' + variantCount + ' mức giá',
+      changedLabel: changed ? 'Đã sửa ' + changed + ' mức giá' : 'Chưa có thay đổi',
+      resetAll: () => this.setState({ priceOv: {}, textOv: {} }),
+      noResults: priceRooms.length === 0,
+      priceRooms,
+
+      ladder: this.ORDER.map((k, i) => {
+        const st = this.subtotal(k);
+        return {
+          num: '0' + (i + 1), name: this.CAT[k].name, tier: this.TIER_LABEL[s.tier[k]],
+          subtotal: this.vnd(st), pct: (total ? Math.round(st / total * 100) : 0) + '%',
+          color: this.COLORS[k],
+          items: this.lines(k).map(l => ({
+            name: l.name, variant: l.variant, price: this.vnd(l.price),
+            share: (st ? Math.round(l.price / st * 100) : 0) + '%',
+          })),
+        };
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
