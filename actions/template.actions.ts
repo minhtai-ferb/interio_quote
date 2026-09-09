@@ -57,10 +57,11 @@ export async function deleteTemplateAction(templateId: string) {
 export async function createTemplateRoomAction(
   templateId: string,
   formData: FormData
-) {
+): Promise<string> {
   const name = requireText(formData.get("name"), "Tên khu vực");
-  await templateQueries.createTemplateRoom(templateId, name);
+  const room = await templateQueries.createTemplateRoom(templateId, name);
   revalidatePath(`/admin/templates/${templateId}`);
+  return room.id;
 }
 
 export async function updateTemplateRoomAction(
@@ -193,5 +194,63 @@ export async function deleteTemplateOptionImageAction(
   if (deleted) {
     await deleteImage(deleted.cloudinaryPublicId).catch(() => {});
   }
+  revalidatePath(`/admin/templates/${templateId}`);
+}
+
+// ── Item image ──
+
+export async function setTemplateOptionItemImageAction(
+  templateId: string,
+  itemId: string,
+  imageUrl: string,
+  cloudinaryPublicId: string
+) {
+  await templateQueries.setTemplateOptionItemImage(itemId, { imageUrl, cloudinaryPublicId });
+  revalidatePath(`/admin/templates/${templateId}`);
+}
+
+export async function removeTemplateOptionItemImageAction(
+  templateId: string,
+  itemId: string
+) {
+  const { deleteImage } = await import("@/lib/cloudinary");
+  const removed = await templateQueries.removeTemplateOptionItemImage(itemId);
+  if (removed?.cloudinaryPublicId) {
+    await deleteImage(removed.cloudinaryPublicId).catch(() => {});
+  }
+  revalidatePath(`/admin/templates/${templateId}`);
+}
+
+// ── Item variants (sub-options) ──
+
+export async function createTemplateOptionItemVariantAction(
+  templateId: string,
+  itemId: string,
+  formData: FormData
+) {
+  const name = requireText(formData.get("name"), "Tên option phụ");
+  const spec = optionalText(formData.get("spec"));
+  const price = requireInt(formData.get("price"), "Giá");
+  await templateQueries.createTemplateOptionItemVariant(itemId, { name, spec, price });
+  revalidatePath(`/admin/templates/${templateId}`);
+}
+
+export async function updateTemplateOptionItemVariantAction(
+  templateId: string,
+  variantId: string,
+  formData: FormData
+) {
+  const name = optionalText(formData.get("name")) ?? undefined;
+  const spec = formData.has("spec") ? optionalText(formData.get("spec")) : undefined;
+  const price = optionalInt(formData.get("price")) ?? undefined;
+  await templateQueries.updateTemplateOptionItemVariant(variantId, { name, spec, price });
+  revalidatePath(`/admin/templates/${templateId}`);
+}
+
+export async function deleteTemplateOptionItemVariantAction(
+  templateId: string,
+  variantId: string
+) {
+  await templateQueries.deleteTemplateOptionItemVariant(variantId);
   revalidatePath(`/admin/templates/${templateId}`);
 }

@@ -5,6 +5,7 @@ import type {
   TemplateOption,
   TemplateOptionImage,
   TemplateOptionItem,
+  TemplateOptionItemVariant,
   TemplateWithRooms,
   TemplateSummary,
 } from "@/types/template";
@@ -80,11 +81,24 @@ export async function getTemplateById(
   const items = optionIds.length
     ? ((await sql`
         SELECT id, template_option_id AS "templateOptionId", name, spec, price,
+          image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
           sort_order AS "sortOrder", created_at AS "createdAt"
         FROM template_option_items
         WHERE template_option_id = ANY(${optionIds})
         ORDER BY sort_order, created_at
       `) as unknown as TemplateOptionItem[])
+    : [];
+
+  const itemIds = items.map((i) => i.id);
+
+  const variants = itemIds.length
+    ? ((await sql`
+        SELECT id, template_option_item_id AS "templateOptionItemId", name, spec, price,
+          sort_order AS "sortOrder", created_at AS "createdAt"
+        FROM template_option_item_variants
+        WHERE template_option_item_id = ANY(${itemIds})
+        ORDER BY sort_order, created_at
+      `) as unknown as TemplateOptionItemVariant[])
     : [];
 
   return {
@@ -96,7 +110,12 @@ export async function getTemplateById(
         .map((option) => ({
           ...option,
           images: images.filter((i) => i.templateOptionId === option.id),
-          items: items.filter((i) => i.templateOptionId === option.id),
+          items: items
+            .filter((i) => i.templateOptionId === option.id)
+            .map((item) => ({
+              ...item,
+              variants: variants.filter((v) => v.templateOptionItemId === item.id),
+            })),
         })),
     })),
   };
@@ -284,6 +303,7 @@ export async function addTemplateOptionItem(
       COALESCE((SELECT MAX(sort_order) + 1 FROM template_option_items WHERE template_option_id = ${templateOptionId}), 0)
     )
     RETURNING id, template_option_id AS "templateOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
       sort_order AS "sortOrder", created_at AS "createdAt"
   `;
   return rows[0] as unknown as TemplateOptionItem;
@@ -300,6 +320,7 @@ export async function updateTemplateOptionItem(
       price = CASE WHEN ${input.price !== undefined} THEN ${input.price ?? null} ELSE price END
     WHERE id = ${id}
     RETURNING id, template_option_id AS "templateOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
       sort_order AS "sortOrder", created_at AS "createdAt"
   `;
   return (rows[0] as unknown as TemplateOptionItem) ?? null;
@@ -307,4 +328,65 @@ export async function updateTemplateOptionItem(
 
 export async function deleteTemplateOptionItem(id: string): Promise<void> {
   await sql`DELETE FROM template_option_items WHERE id = ${id}`;
+}
+
+export async function setTemplateOptionItemImage(
+  id: string,
+  input: { imageUrl: string; cloudinaryPublicId: string }
+): Promise<TemplateOptionItem | null> {
+  const rows = await sql`
+    UPDATE template_option_items SET image_url = ${input.imageUrl}, cloudinary_public_id = ${input.cloudinaryPublicId}
+    WHERE id = ${id}
+    RETURNING id, template_option_id AS "templateOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return (rows[0] as unknown as TemplateOptionItem) ?? null;
+}
+
+export async function removeTemplateOptionItemImage(id: string): Promise<{ cloudinaryPublicId: string | null } | null> {
+  const rows = await sql`
+    UPDATE template_option_items SET image_url = NULL, cloudinary_public_id = NULL
+    WHERE id = ${id}
+    RETURNING cloudinary_public_id AS "cloudinaryPublicId"
+  `;
+  return (rows[0] as unknown as { cloudinaryPublicId: string | null }) ?? null;
+}
+
+// ── Item variants (sub-options) ──
+
+export async function createTemplateOptionItemVariant(
+  templateOptionItemId: string,
+  input: { name: string; spec?: string | null; price: number }
+): Promise<TemplateOptionItemVariant> {
+  const rows = await sql`
+    INSERT INTO template_option_item_variants (template_option_item_id, name, spec, price, sort_order)
+    VALUES (
+      ${templateOptionItemId}, ${input.name}, ${input.spec ?? null}, ${input.price},
+      COALESCE((SELECT MAX(sort_order) + 1 FROM template_option_item_variants WHERE template_option_item_id = ${templateOptionItemId}), 0)
+    )
+    RETURNING id, template_option_item_id AS "templateOptionItemId", name, spec, price,
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return rows[0] as unknown as TemplateOptionItemVariant;
+}
+
+export async function updateTemplateOptionItemVariant(
+  id: string,
+  input: { name?: string; spec?: string | null; price?: number }
+): Promise<TemplateOptionItemVariant | null> {
+  const rows = await sql`
+    UPDATE template_option_item_variants SET
+      name = COALESCE(${input.name ?? null}, name),
+      spec = CASE WHEN ${input.spec !== undefined} THEN ${input.spec ?? null} ELSE spec END,
+      price = COALESCE(${input.price ?? null}, price)
+    WHERE id = ${id}
+    RETURNING id, template_option_item_id AS "templateOptionItemId", name, spec, price,
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return (rows[0] as unknown as TemplateOptionItemVariant) ?? null;
+}
+
+export async function deleteTemplateOptionItemVariant(id: string): Promise<void> {
+  await sql`DELETE FROM template_option_item_variants WHERE id = ${id}`;
 }

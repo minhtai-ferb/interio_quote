@@ -42,13 +42,29 @@ export interface TemplateOptionItem {
   name: string;
   spec: string | null;
   price: number | null;
+  imageUrl: string | null;
+  cloudinaryPublicId: string | null;
   sortOrder: number;
   createdAt: string;
 }
 
+export interface TemplateOptionItemVariant {
+  id: string;
+  templateOptionItemId: string;
+  name: string;
+  spec: string | null;
+  price: number;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface TemplateOptionItemWithVariants extends TemplateOptionItem {
+  variants: TemplateOptionItemVariant[];
+}
+
 export interface TemplateOptionWithDetails extends TemplateOption {
   images: TemplateOptionImage[];
-  items: TemplateOptionItem[];
+  items: TemplateOptionItemWithVariants[];
 }
 
 export interface TemplateRoomWithOptions extends TemplateRoom {

@@ -15,9 +15,15 @@ import {
   deleteTemplateOptionItemAction,
   addTemplateOptionImageAction,
   deleteTemplateOptionImageAction,
+  setTemplateOptionItemImageAction,
+  removeTemplateOptionItemImageAction,
+  createTemplateOptionItemVariantAction,
+  updateTemplateOptionItemVariantAction,
+  deleteTemplateOptionItemVariantAction,
 } from "@/actions/template.actions";
 import { OptionCard } from "@/components/option-card";
 import { ActionForm } from "@/components/action-form";
+import { CreateRoomForm } from "@/components/create-room-form";
 import { COLORS, trieu } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
@@ -89,16 +95,10 @@ export default async function TemplateEditorPage({
               </Link>
             ))}
           </div>
-          <ActionForm
+          <CreateRoomForm
             action={createTemplateRoomAction.bind(null, template.id)}
-            successMessage="Đã thêm khu vực"
-            style={{ display: "flex", gap: 6 }}
-          >
-            <input name="name" placeholder="Tên khu vực mới" required style={{ flex: 1, minWidth: 0, height: 36, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
-            <button type="submit" style={{ flex: "none", minHeight: 36, padding: "8px 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
-              + Thêm
-            </button>
-          </ActionForm>
+            basePath={`/admin/templates/${template.id}`}
+          />
         </div>
 
         <div className="iq-editor-col" style={{ flex: "1 1 460px", minWidth: 320 }}>
@@ -142,6 +142,11 @@ export default async function TemplateEditorPage({
                     deleteItem: deleteTemplateOptionItemAction.bind(null, template.id),
                     addImage: addTemplateOptionImageAction.bind(null, template.id, option.id),
                     deleteImage: deleteTemplateOptionImageAction.bind(null, template.id),
+                    setItemImage: setTemplateOptionItemImageAction.bind(null, template.id),
+                    removeItemImage: removeTemplateOptionItemImageAction.bind(null, template.id),
+                    addItemVariant: createTemplateOptionItemVariantAction.bind(null, template.id),
+                    updateItemVariant: updateTemplateOptionItemVariantAction.bind(null, template.id),
+                    deleteItemVariant: deleteTemplateOptionItemVariantAction.bind(null, template.id),
                   }}
                 />
               ))}

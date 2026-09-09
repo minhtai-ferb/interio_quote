@@ -7,6 +7,23 @@ import { submitCustomerSelectionsAction } from "@/actions/quote.actions";
 import { useToast } from "@/components/toast-provider";
 import { useImageLightbox } from "@/components/lightbox";
 
+export interface SelectionItemVariant {
+  id: string;
+  name: string;
+  spec: string | null;
+  price: number;
+}
+
+export interface SelectionItem {
+  id: string;
+  name: string;
+  spec: string | null;
+  price: number | null;
+  imageUrl: string | null;
+  variants: SelectionItemVariant[];
+  selectedVariantId: string | null;
+}
+
 export interface SelectionOption {
   id: string;
   name: string;
@@ -14,7 +31,7 @@ export interface SelectionOption {
   priceTo: number;
   description: string | null;
   images: { id: string; imageUrl: string }[];
-  items: { id: string; name: string; spec: string | null; price: number | null }[];
+  items: SelectionItem[];
 }
 
 export interface SelectionRoom {
@@ -27,6 +44,20 @@ const ROOM_COLORS = ["#163A5F", "#33648C", "#6C93B4", "#8AA9C4", "#B9CEE0", "#D8
 
 function midpoint(o: SelectionOption): number {
   return Math.round((o.priceFrom + o.priceTo) / 2 / 100000) * 100000;
+}
+
+function itemEffectivePrice(item: SelectionItem, variantPicks: Record<string, string>): number {
+  if (item.variants.length > 0) {
+    const pickedId = variantPicks[item.id] ?? item.variants[0]?.id;
+    const variant = item.variants.find((v) => v.id === pickedId) ?? item.variants[0];
+    return variant?.price ?? 0;
+  }
+  return item.price ?? 0;
+}
+
+function optionAmount(option: SelectionOption, variantPicks: Record<string, string>): number {
+  if (option.items.length === 0) return midpoint(option);
+  return option.items.reduce((a, it) => a + itemEffectivePrice(it, variantPicks), 0);
 }
 
 export function CustomerSelectionForm({
@@ -49,6 +80,17 @@ export function CustomerSelectionForm({
   const router = useRouter();
   const { showToast } = useToast();
   const [selections, setSelections] = useState<Record<string, string | null>>(initialSelections);
+  const [variantPicks, setVariantPicks] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const room of rooms) {
+      for (const option of room.options) {
+        for (const item of option.items) {
+          if (item.selectedVariantId) init[item.id] = item.selectedVariantId;
+        }
+      }
+    }
+    return init;
+  });
   const [activeRoomId, setActiveRoomId] = useState<string>(rooms[0]?.id ?? "");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -64,10 +106,10 @@ export function CustomerSelectionForm({
   const budget = useMemo(() => {
     return rooms.map((room) => {
       const option = selectedOptionOf(room);
-      return { room, option, amount: option ? midpoint(option) : 0 };
+      return { room, option, amount: option ? optionAmount(option, variantPicks) : 0 };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rooms, selections]);
+  }, [rooms, selections, variantPicks]);
 
   const total = budget.reduce((a, b) => a + b.amount, 0);
   const missing = rooms.filter((r) => !(selections[r.id] ?? r.options[0]?.id) && r.options.length > 0);
@@ -83,9 +125,14 @@ export function CustomerSelectionForm({
       .map((room) => ({ roomId: room.id, optionId: selections[room.id] ?? room.options[0]?.id ?? null }))
       .filter((s): s is { roomId: string; optionId: string } => !!s.optionId);
 
+    const itemVariantPayload = rooms
+      .flatMap((room) => selectedOptionOf(room)?.items ?? [])
+      .filter((item) => item.variants.length > 0)
+      .map((item) => ({ itemId: item.id, variantId: variantPicks[item.id] ?? item.variants[0].id }));
+
     startTransition(async () => {
       try {
-        await submitCustomerSelectionsAction(token, payload);
+        await submitCustomerSelectionsAction(token, payload, itemVariantPayload);
         setSubmitted(true);
         showToast("Đã ghi nhận lựa chọn của bạn", "success");
         router.refresh();
@@ -100,8 +147,9 @@ export function CustomerSelectionForm({
   const activeRoom = rooms.find((r) => r.id === activeRoomId) ?? rooms[0] ?? null;
   const activeRoomIndex = activeRoom ? rooms.indexOf(activeRoom) : -1;
   const activeOption = activeRoom ? selectedOptionOf(activeRoom) : null;
-  const activeImages = activeOption?.images.map((i) => i.imageUrl) ?? [];
-  const lightbox = useImageLightbox(activeImages);
+  const activeOptionImages = activeOption?.images.map((i) => i.imageUrl) ?? [];
+  const activeAmount = activeOption ? optionAmount(activeOption, variantPicks) : 0;
+  const lightbox = useImageLightbox(activeOptionImages);
 
   const heroImage = rooms.flatMap((r) => r.options).flatMap((o) => o.images)[0]?.imageUrl ?? null;
   const heroLightbox = useImageLightbox(heroImage ? [heroImage] : []);
@@ -164,7 +212,7 @@ export function CustomerSelectionForm({
                   <span style={{ flex: 1, fontSize: 16.5, fontWeight: 500 }}>{r.name}</span>
                   <span style={{ fontSize: 12.5, color: COLORS.muted, whiteSpace: "nowrap" }}>{option?.name ?? "—"}</span>
                   <span style={{ fontSize: 13, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
-                    {option ? trieu(midpoint(option)) : ""}
+                    {option ? trieu(optionAmount(option, variantPicks)) : ""}
                   </span>
                 </button>
               );
@@ -241,11 +289,11 @@ export function CustomerSelectionForm({
                 </span>
               </div>
 
-              {activeImages.length > 0 && (
+              {activeOptionImages.length > 0 && (
                 <div
                   onClick={() => lightbox.open(0)}
                   style={{
-                    width: "100%", height: "clamp(230px,32vw,420px)", backgroundImage: `url(${activeImages[0]})`,
+                    width: "100%", height: "clamp(230px,32vw,420px)", backgroundImage: `url(${activeOptionImages[0]})`,
                     backgroundSize: "cover", backgroundPosition: "center", marginBottom: 32, cursor: "zoom-in",
                   }}
                 />
@@ -297,7 +345,8 @@ export function CustomerSelectionForm({
 
               <div style={{ borderTop: `2px solid ${COLORS.text}` }}>
                 {activeOption?.items.map((it, n) => {
-                  const img = activeImages.length > 0 ? activeImages[n % activeImages.length] : null;
+                  const img = it.imageUrl ?? (activeOptionImages.length > 0 ? activeOptionImages[n % activeOptionImages.length] : null);
+                  const pickedVariantId = it.variants.length > 0 ? (variantPicks[it.id] ?? it.variants[0].id) : null;
                   return (
                     <div
                       key={it.id}
@@ -308,7 +357,10 @@ export function CustomerSelectionForm({
                     >
                       {img && (
                         <div
-                          onClick={() => lightbox.open(n % activeImages.length)}
+                          onClick={() => {
+                            const idx = activeOptionImages.indexOf(img);
+                            lightbox.open(idx >= 0 ? idx : 0);
+                          }}
                           style={{ width: "100%", height: 180, backgroundImage: `url(${img})`, backgroundSize: "cover", backgroundPosition: "center", cursor: "zoom-in" }}
                         />
                       )}
@@ -322,12 +374,45 @@ export function CustomerSelectionForm({
                         {it.spec && (
                           <div style={{ fontSize: 13.5, marginTop: 8, color: COLORS.muted }}>{it.spec}</div>
                         )}
-                        {it.price != null && (
+                        {it.variants.length === 0 && it.price != null && (
                           <div style={{ fontSize: 13.5, fontWeight: 600, color: COLORS.navy, marginTop: 8, fontVariantNumeric: "tabular-nums" }}>
                             {vnd(it.price)}
                           </div>
                         )}
                       </div>
+                      {it.variants.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 10 }}>
+                            Chọn kiểu / vật liệu
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                            {it.variants.map((v) => {
+                              const active = v.id === pickedVariantId;
+                              return (
+                                <button
+                                  key={v.id}
+                                  type="button"
+                                  onClick={() => setVariantPicks((s) => ({ ...s, [it.id]: v.id }))}
+                                  style={{
+                                    display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14,
+                                    width: "100%", textAlign: "left", padding: "11px 12px",
+                                    border: `1px solid ${active ? COLORS.navy : COLORS.border}`,
+                                    background: active ? COLORS.navy : "#fff", color: active ? "#fff" : COLORS.text, cursor: "pointer",
+                                  }}
+                                >
+                                  <span>
+                                    <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>{v.name}</span>
+                                    {v.spec && <span style={{ display: "block", fontSize: 11.5, opacity: 0.7, marginTop: 2 }}>{v.spec}</span>}
+                                  </span>
+                                  <span style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                                    {vnd(v.price)}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -336,7 +421,7 @@ export function CustomerSelectionForm({
                     Tạm tính {activeRoom.name}
                   </span>
                   <span style={{ fontSize: "clamp(24px,3vw,34px)", fontWeight: 700, color: COLORS.navy, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
-                    {activeOption ? `${trieu(activeOption.priceFrom)} – ${trieu(activeOption.priceTo)}` : "—"}
+                    {activeOption ? vnd(activeAmount) : "—"}
                   </span>
                 </div>
               </div>

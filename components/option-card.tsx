@@ -2,6 +2,22 @@ import { COLORS } from "@/lib/theme";
 import { ImageUploader } from "@/components/image-uploader";
 import { ActionForm } from "@/components/action-form";
 
+export interface OptionCardItemVariant {
+  id: string;
+  name: string;
+  spec: string | null;
+  price: number;
+}
+
+export interface OptionCardItem {
+  id: string;
+  name: string;
+  spec: string | null;
+  price: number | null;
+  imageUrl: string | null;
+  variants: OptionCardItemVariant[];
+}
+
 export interface OptionCardData {
   id: string;
   name: string;
@@ -9,7 +25,7 @@ export interface OptionCardData {
   priceTo: number;
   description: string | null;
   images: { id: string; imageUrl: string }[];
-  items: { id: string; name: string; spec: string | null; price: number | null }[];
+  items: OptionCardItem[];
 }
 
 export interface OptionCardActions {
@@ -20,7 +36,16 @@ export interface OptionCardActions {
   deleteItem: (itemId: string) => Promise<void>;
   addImage: (imageUrl: string, cloudinaryPublicId: string) => Promise<void>;
   deleteImage: (imageId: string) => Promise<void>;
+  setItemImage: (itemId: string, imageUrl: string, cloudinaryPublicId: string) => Promise<void>;
+  removeItemImage: (itemId: string) => Promise<void>;
+  addItemVariant: (itemId: string, formData: FormData) => Promise<void>;
+  updateItemVariant: (variantId: string, formData: FormData) => Promise<void>;
+  deleteItemVariant: (variantId: string) => Promise<void>;
 }
+
+const fieldStyle: React.CSSProperties = {
+  flex: "1 1 140px", minWidth: 0, height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5,
+};
 
 export function OptionCard({
   option,
@@ -100,7 +125,7 @@ export function OptionCard({
 
       <div style={{ padding: 18, borderBottom: `1px solid ${COLORS.border}` }}>
         <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 10 }}>
-          Hình ảnh
+          Hình ảnh (chung cho cả phương án)
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
           {option.images.map((img) => (
@@ -133,41 +158,113 @@ export function OptionCard({
         <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 10 }}>
           Hạng mục bao gồm
         </div>
-        <div style={{ borderTop: `1px solid ${COLORS.border}` }}>
-          {option.items.map((it) => (
-            <ActionForm
-              key={it.id}
-              actions={{
-                save: { run: actions.updateItem.bind(null, it.id), message: "Đã lưu hạng mục" },
-                delete: { run: actions.deleteItem.bind(null, it.id), message: "Đã xóa hạng mục" },
-              }}
-              className="iq-grid-stack"
-              style={{ display: "grid", gridTemplateColumns: "1.3fr 1.5fr 110px auto", gap: 10, alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${COLORS.border}` }}
-            >
-              <input name="name" defaultValue={it.name} style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
-              <input name="spec" defaultValue={it.spec ?? ""} placeholder="Mô tả / vật liệu" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
-              <input type="number" name="price" defaultValue={it.price ?? ""} placeholder="Giá" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, textAlign: "right" }} />
-              <div style={{ display: "flex", gap: 6 }}>
-                <button type="submit" data-intent="save" style={{ width: 30, height: 30, border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11 }} title="Lưu">
-                  ✓
-                </button>
-                <button type="submit" data-intent="delete" style={{ width: 30, height: 30, border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11 }} title="Xóa">
-                  ✕
-                </button>
-              </div>
-            </ActionForm>
-          ))}
-        </div>
+
+        {option.items.map((item) => (
+          <ItemBlock key={item.id} item={item} imageFolder={imageFolder} actions={actions} />
+        ))}
+
         <ActionForm
           action={actions.addItem}
           successMessage="Đã thêm hạng mục"
-          className="iq-grid-stack"
-          style={{ display: "grid", gridTemplateColumns: "1.3fr 1.5fr 110px auto", gap: 10, alignItems: "center", marginTop: 10 }}
+          style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}
         >
-          <input name="name" placeholder="Tên hạng mục" required style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
-          <input name="spec" placeholder="Mô tả / vật liệu" style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
-          <input type="number" name="price" placeholder="Giá" style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, textAlign: "right" }} />
-          <button type="submit" style={{ minHeight: 34, padding: "8px 10px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
+          <input name="name" placeholder="Tên hạng mục" required style={fieldStyle} />
+          <input name="spec" placeholder="Mô tả / vật liệu" style={fieldStyle} />
+          <input type="number" name="price" placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+          <button type="submit" style={{ flex: "none", minHeight: 34, padding: "8px 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
+            + Thêm hạng mục
+          </button>
+        </ActionForm>
+      </div>
+    </div>
+  );
+}
+
+function ItemBlock({
+  item,
+  imageFolder,
+  actions,
+}: {
+  item: OptionCardItem;
+  imageFolder: "templates" | "quotes";
+  actions: OptionCardActions;
+}) {
+  return (
+    <div style={{ border: `1px solid ${COLORS.border}`, marginBottom: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, padding: 14 }}>
+        <div style={{ flex: "none" }}>
+          {item.imageUrl ? (
+            <div style={{ position: "relative", width: 90, height: 90 }}>
+              <div style={{ width: 90, height: 90, backgroundImage: `url(${item.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <ActionForm action={actions.removeItemImage.bind(null, item.id)} successMessage="Đã xóa ảnh hạng mục" style={{ position: "absolute", top: 2, right: 2 }}>
+                <button type="submit" style={{ width: 20, height: 20, border: 0, background: "rgba(31,41,51,.75)", color: "#fff", cursor: "pointer", fontSize: 10 }}>
+                  ✕
+                </button>
+              </ActionForm>
+            </div>
+          ) : (
+            <div style={{ width: 90 }}>
+              <ImageUploader folder={imageFolder} onUploaded={actions.setItemImage.bind(null, item.id)} />
+            </div>
+          )}
+        </div>
+
+        <ActionForm
+          actions={{
+            save: { run: actions.updateItem.bind(null, item.id), message: "Đã lưu hạng mục" },
+            delete: { run: actions.deleteItem.bind(null, item.id), message: "Đã xóa hạng mục" },
+          }}
+          style={{ flex: "1 1 260px", minWidth: 0, display: "grid", gap: 8 }}
+        >
+          <input name="name" defaultValue={item.name} placeholder="Tên hạng mục" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 13, fontWeight: 600 }} />
+          <input name="spec" defaultValue={item.spec ?? ""} placeholder="Mô tả / vật liệu" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
+          <input type="number" name="price" defaultValue={item.price ?? ""} placeholder="Giá cơ bản" style={{ height: 32, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5, maxWidth: 160, textAlign: "right" }} />
+          <div style={{ display: "flex", gap: 8 }}>
+            <button type="submit" data-intent="save" style={{ minHeight: 30, padding: "0 12px", border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
+              Lưu
+            </button>
+            <button type="submit" data-intent="delete" style={{ minHeight: 30, padding: "0 12px", border: "1px solid #E4E9EE", background: "#fff", color: "#B42318", cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
+              Xóa hạng mục
+            </button>
+          </div>
+        </ActionForm>
+      </div>
+
+      <div style={{ borderTop: `1px solid ${COLORS.border}`, padding: 14, background: COLORS.bg }}>
+        <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 8 }}>
+          Option phụ (để khách chọn thêm kiểu / vật liệu khác)
+        </div>
+        {item.variants.map((v) => (
+          <ActionForm
+            key={v.id}
+            actions={{
+              save: { run: actions.updateItemVariant.bind(null, v.id), message: "Đã lưu option phụ" },
+              delete: { run: actions.deleteItemVariant.bind(null, v.id), message: "Đã xóa option phụ" },
+            }}
+            style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 6 }}
+          >
+            <input name="name" defaultValue={v.name} placeholder="Tên option phụ" style={fieldStyle} />
+            <input name="spec" defaultValue={v.spec ?? ""} placeholder="Mô tả" style={fieldStyle} />
+            <input type="number" name="price" defaultValue={v.price} placeholder="Giá" style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+            <div style={{ display: "flex", gap: 4, flex: "none" }}>
+              <button type="submit" data-intent="save" style={{ width: 28, height: 28, border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11 }} title="Lưu">
+                ✓
+              </button>
+              <button type="submit" data-intent="delete" style={{ width: 28, height: 28, border: `1px solid ${COLORS.border}`, background: "#fff", cursor: "pointer", fontSize: 11 }} title="Xóa">
+                ✕
+              </button>
+            </div>
+          </ActionForm>
+        ))}
+        <ActionForm
+          action={actions.addItemVariant.bind(null, item.id)}
+          successMessage="Đã thêm option phụ"
+          style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}
+        >
+          <input name="name" placeholder="Tên option phụ" required style={fieldStyle} />
+          <input name="spec" placeholder="Mô tả" style={fieldStyle} />
+          <input type="number" name="price" placeholder="Giá" required style={{ ...fieldStyle, flex: "0 1 110px", textAlign: "right" }} />
+          <button type="submit" style={{ flex: "none", minHeight: 32, padding: "0 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>
             + Thêm
           </button>
         </ActionForm>

@@ -60,8 +60,25 @@ export interface QuoteOptionItem {
   name: string;
   spec: string | null;
   price: number | null;
+  imageUrl: string | null;
+  cloudinaryPublicId: string | null;
   sortOrder: number;
   createdAt: string;
+}
+
+export interface QuoteOptionItemVariant {
+  id: string;
+  quoteOptionItemId: string;
+  name: string;
+  spec: string | null;
+  price: number;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface QuoteOptionItemWithVariants extends QuoteOptionItem {
+  variants: QuoteOptionItemVariant[];
+  selectedVariantId: string | null;
 }
 
 export interface QuoteSelection {
@@ -76,7 +93,7 @@ export interface QuoteSelection {
 
 export interface QuoteOptionWithDetails extends QuoteOption {
   images: QuoteOptionImage[];
-  items: QuoteOptionItem[];
+  items: QuoteOptionItemWithVariants[];
 }
 
 export interface QuoteRoomWithOptions extends QuoteRoom {

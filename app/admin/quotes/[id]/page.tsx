@@ -14,9 +14,15 @@ import {
   deleteQuoteOptionItemAction,
   addQuoteOptionImageAction,
   deleteQuoteOptionImageAction,
+  setQuoteOptionItemImageAction,
+  removeQuoteOptionItemImageAction,
+  createQuoteOptionItemVariantAction,
+  updateQuoteOptionItemVariantAction,
+  deleteQuoteOptionItemVariantAction,
 } from "@/actions/quote.actions";
 import { OptionCard } from "@/components/option-card";
 import { ActionForm } from "@/components/action-form";
+import { CreateRoomForm } from "@/components/create-room-form";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { COLORS, STATUS_LABEL, statusColors, trieu } from "@/lib/theme";
 
@@ -108,16 +114,10 @@ export default async function QuoteEditorPage({
           ))}
         </div>
         {!isLocked && (
-          <ActionForm
+          <CreateRoomForm
             action={createQuoteRoomAction.bind(null, quote.id)}
-            successMessage="Đã thêm khu vực"
-            style={{ display: "flex", gap: 6 }}
-          >
-            <input name="name" placeholder="Tên khu vực mới" required style={{ flex: 1, minWidth: 0, height: 36, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
-            <button type="submit" style={{ flex: "none", minHeight: 36, padding: "8px 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
-              + Thêm
-            </button>
-          </ActionForm>
+            basePath={`/admin/quotes/${quote.id}`}
+          />
         )}
       </div>
 
@@ -167,6 +167,11 @@ export default async function QuoteEditorPage({
                     deleteItem: deleteQuoteOptionItemAction.bind(null, quote.id),
                     addImage: addQuoteOptionImageAction.bind(null, quote.id, option.id),
                     deleteImage: deleteQuoteOptionImageAction.bind(null, quote.id),
+                    setItemImage: setQuoteOptionItemImageAction.bind(null, quote.id),
+                    removeItemImage: removeQuoteOptionItemImageAction.bind(null, quote.id),
+                    addItemVariant: createQuoteOptionItemVariantAction.bind(null, quote.id),
+                    updateItemVariant: updateQuoteOptionItemVariantAction.bind(null, quote.id),
+                    deleteItemVariant: deleteQuoteOptionItemVariantAction.bind(null, quote.id),
                   }}
                 />
               )

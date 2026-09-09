@@ -7,6 +7,7 @@ import type {
   QuoteOption,
   QuoteOptionImage,
   QuoteOptionItem,
+  QuoteOptionItemVariant,
   QuoteSelection,
   QuoteWithDetails,
   QuoteListItem,
@@ -83,11 +84,32 @@ async function assembleQuoteDetails(
   const items = optionIds.length
     ? ((await sql`
         SELECT id, quote_option_id AS "quoteOptionId", name, spec, price,
+          image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
           sort_order AS "sortOrder", created_at AS "createdAt"
         FROM quote_option_items
         WHERE quote_option_id = ANY(${optionIds})
         ORDER BY sort_order, created_at
       `) as unknown as QuoteOptionItem[])
+    : [];
+
+  const itemIds = items.map((i) => i.id);
+
+  const variants = itemIds.length
+    ? ((await sql`
+        SELECT id, quote_option_item_id AS "quoteOptionItemId", name, spec, price,
+          sort_order AS "sortOrder", created_at AS "createdAt"
+        FROM quote_option_item_variants
+        WHERE quote_option_item_id = ANY(${itemIds})
+        ORDER BY sort_order, created_at
+      `) as unknown as QuoteOptionItemVariant[])
+    : [];
+
+  const itemVariantSelections = itemIds.length
+    ? await sql`
+        SELECT quote_option_item_id AS "quoteOptionItemId", quote_option_item_variant_id AS "quoteOptionItemVariantId"
+        FROM quote_item_variant_selections
+        WHERE quote_id = ${quote.id}
+      `
     : [];
 
   const selections = (await sql`
@@ -133,7 +155,16 @@ async function assembleQuoteDetails(
           .map((option) => ({
             ...option,
             images: images.filter((i) => i.quoteOptionId === option.id),
-            items: items.filter((i) => i.quoteOptionId === option.id),
+            items: items
+              .filter((i) => i.quoteOptionId === option.id)
+              .map((item) => ({
+                ...item,
+                variants: variants.filter((v) => v.quoteOptionItemId === item.id),
+                selectedVariantId:
+                  (itemVariantSelections as { quoteOptionItemId: string; quoteOptionItemVariantId: string }[]).find(
+                    (s) => s.quoteOptionItemId === item.id
+                  )?.quoteOptionItemVariantId ?? null,
+              })),
           })),
       };
     }),
@@ -270,21 +301,43 @@ export async function createQuoteFromTemplate(
         }
 
         const itemsRes = await client.query<{
+          id: string;
           name: string;
           spec: string | null;
           price: number | null;
+          image_url: string | null;
+          cloudinary_public_id: string | null;
           sort_order: number;
         }>(
-          `SELECT name, spec, price, sort_order
+          `SELECT id, name, spec, price, image_url, cloudinary_public_id, sort_order
            FROM template_option_items WHERE template_option_id = $1 ORDER BY sort_order, created_at`,
           [option.id]
         );
         for (const item of itemsRes.rows) {
-          await client.query(
-            `INSERT INTO quote_option_items (quote_option_id, name, spec, price, sort_order)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [newOptionId, item.name, item.spec, item.price, item.sort_order]
+          const newItemRes = await client.query<{ id: string }>(
+            `INSERT INTO quote_option_items (quote_option_id, name, spec, price, image_url, cloudinary_public_id, sort_order)
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            [newOptionId, item.name, item.spec, item.price, item.image_url, item.cloudinary_public_id, item.sort_order]
           );
+          const newItemId = newItemRes.rows[0].id;
+
+          const variantsRes = await client.query<{
+            name: string;
+            spec: string | null;
+            price: number;
+            sort_order: number;
+          }>(
+            `SELECT name, spec, price, sort_order
+             FROM template_option_item_variants WHERE template_option_item_id = $1 ORDER BY sort_order, created_at`,
+            [item.id]
+          );
+          for (const variant of variantsRes.rows) {
+            await client.query(
+              `INSERT INTO quote_option_item_variants (quote_option_item_id, name, spec, price, sort_order)
+               VALUES ($1, $2, $3, $4, $5)`,
+              [newItemId, variant.name, variant.spec, variant.price, variant.sort_order]
+            );
+          }
         }
       }
     }
@@ -355,7 +408,8 @@ export async function ensureConsulting(id: string): Promise<void> {
 
 export async function submitCustomerSelections(
   token: string,
-  selections: { roomId: string; optionId: string }[]
+  selections: { roomId: string; optionId: string }[],
+  itemVariantSelections: { itemId: string; variantId: string }[] = []
 ): Promise<QuoteWithDetails> {
   return withTransaction(async (client) => {
     const quoteRes = await client.query<{ id: string; status: QuoteStatus }>(
@@ -393,6 +447,27 @@ export async function submitCustomerSelections(
          ON CONFLICT (quote_id, quote_room_id)
          DO UPDATE SET quote_option_id = EXCLUDED.quote_option_id, updated_at = now()`,
         [quote.id, sel.roomId, sel.optionId]
+      );
+    }
+
+    for (const sel of itemVariantSelections) {
+      const variantRes = await client.query(
+        `SELECT v.id FROM quote_option_item_variants v
+         JOIN quote_option_items i ON i.id = v.quote_option_item_id
+         JOIN quote_options o ON o.id = i.quote_option_id
+         JOIN quote_rooms r ON r.id = o.quote_room_id
+         WHERE v.id = $1 AND v.quote_option_item_id = $2 AND r.quote_id = $3`,
+        [sel.variantId, sel.itemId, quote.id]
+      );
+      if (variantRes.rows.length === 0) {
+        throw new Error("Lựa chọn hạng mục không hợp lệ");
+      }
+      await client.query(
+        `INSERT INTO quote_item_variant_selections (quote_id, quote_option_item_id, quote_option_item_variant_id)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (quote_id, quote_option_item_id)
+         DO UPDATE SET quote_option_item_variant_id = EXCLUDED.quote_option_item_variant_id, updated_at = now()`,
+        [quote.id, sel.itemId, sel.variantId]
       );
     }
 
@@ -609,6 +684,7 @@ export async function addQuoteOptionItem(
       COALESCE((SELECT MAX(sort_order) + 1 FROM quote_option_items WHERE quote_option_id = ${quoteOptionId}), 0)
     )
     RETURNING id, quote_option_id AS "quoteOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
       sort_order AS "sortOrder", created_at AS "createdAt"
   `;
   return rows[0] as unknown as QuoteOptionItem;
@@ -625,6 +701,7 @@ export async function updateQuoteOptionItem(
       price = CASE WHEN ${input.price !== undefined} THEN ${input.price ?? null} ELSE price END
     WHERE id = ${id}
     RETURNING id, quote_option_id AS "quoteOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
       sort_order AS "sortOrder", created_at AS "createdAt"
   `;
   return (rows[0] as unknown as QuoteOptionItem) ?? null;
@@ -632,4 +709,65 @@ export async function updateQuoteOptionItem(
 
 export async function deleteQuoteOptionItem(id: string): Promise<void> {
   await sql`DELETE FROM quote_option_items WHERE id = ${id}`;
+}
+
+export async function setQuoteOptionItemImage(
+  id: string,
+  input: { imageUrl: string; cloudinaryPublicId: string }
+): Promise<QuoteOptionItem | null> {
+  const rows = await sql`
+    UPDATE quote_option_items SET image_url = ${input.imageUrl}, cloudinary_public_id = ${input.cloudinaryPublicId}
+    WHERE id = ${id}
+    RETURNING id, quote_option_id AS "quoteOptionId", name, spec, price,
+      image_url AS "imageUrl", cloudinary_public_id AS "cloudinaryPublicId",
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return (rows[0] as unknown as QuoteOptionItem) ?? null;
+}
+
+export async function removeQuoteOptionItemImage(id: string): Promise<{ cloudinaryPublicId: string | null } | null> {
+  const rows = await sql`
+    UPDATE quote_option_items SET image_url = NULL, cloudinary_public_id = NULL
+    WHERE id = ${id}
+    RETURNING cloudinary_public_id AS "cloudinaryPublicId"
+  `;
+  return (rows[0] as unknown as { cloudinaryPublicId: string | null }) ?? null;
+}
+
+// ── Item variants (sub-options) ──
+
+export async function createQuoteOptionItemVariant(
+  quoteOptionItemId: string,
+  input: { name: string; spec?: string | null; price: number }
+): Promise<QuoteOptionItemVariant> {
+  const rows = await sql`
+    INSERT INTO quote_option_item_variants (quote_option_item_id, name, spec, price, sort_order)
+    VALUES (
+      ${quoteOptionItemId}, ${input.name}, ${input.spec ?? null}, ${input.price},
+      COALESCE((SELECT MAX(sort_order) + 1 FROM quote_option_item_variants WHERE quote_option_item_id = ${quoteOptionItemId}), 0)
+    )
+    RETURNING id, quote_option_item_id AS "quoteOptionItemId", name, spec, price,
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return rows[0] as unknown as QuoteOptionItemVariant;
+}
+
+export async function updateQuoteOptionItemVariant(
+  id: string,
+  input: { name?: string; spec?: string | null; price?: number }
+): Promise<QuoteOptionItemVariant | null> {
+  const rows = await sql`
+    UPDATE quote_option_item_variants SET
+      name = COALESCE(${input.name ?? null}, name),
+      spec = CASE WHEN ${input.spec !== undefined} THEN ${input.spec ?? null} ELSE spec END,
+      price = COALESCE(${input.price ?? null}, price)
+    WHERE id = ${id}
+    RETURNING id, quote_option_item_id AS "quoteOptionItemId", name, spec, price,
+      sort_order AS "sortOrder", created_at AS "createdAt"
+  `;
+  return (rows[0] as unknown as QuoteOptionItemVariant) ?? null;
+}
+
+export async function deleteQuoteOptionItemVariant(id: string): Promise<void> {
+  await sql`DELETE FROM quote_option_item_variants WHERE id = ${id}`;
 }

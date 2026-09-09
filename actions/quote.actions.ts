@@ -84,10 +84,11 @@ export async function ensureConsultingAction(quoteId: string) {
 
 // ── Quote rooms ──
 
-export async function createQuoteRoomAction(quoteId: string, formData: FormData) {
+export async function createQuoteRoomAction(quoteId: string, formData: FormData): Promise<string> {
   const name = requireText(formData.get("name"), "Tên khu vực");
-  await quoteQueries.createQuoteRoom(quoteId, name);
+  const room = await quoteQueries.createQuoteRoom(quoteId, name);
   revalidatePath(`/admin/quotes/${quoteId}`);
+  return room.id;
 }
 
 export async function updateQuoteRoomAction(
@@ -196,13 +197,66 @@ export async function deleteQuoteOptionImageAction(quoteId: string, imageId: str
   revalidatePath(`/admin/quotes/${quoteId}`);
 }
 
+// ── Item image ──
+
+export async function setQuoteOptionItemImageAction(
+  quoteId: string,
+  itemId: string,
+  imageUrl: string,
+  cloudinaryPublicId: string
+) {
+  await quoteQueries.setQuoteOptionItemImage(itemId, { imageUrl, cloudinaryPublicId });
+  revalidatePath(`/admin/quotes/${quoteId}`);
+}
+
+export async function removeQuoteOptionItemImageAction(quoteId: string, itemId: string) {
+  const { deleteImage } = await import("@/lib/cloudinary");
+  const removed = await quoteQueries.removeQuoteOptionItemImage(itemId);
+  if (removed?.cloudinaryPublicId) {
+    await deleteImage(removed.cloudinaryPublicId).catch(() => {});
+  }
+  revalidatePath(`/admin/quotes/${quoteId}`);
+}
+
+// ── Item variants (sub-options) ──
+
+export async function createQuoteOptionItemVariantAction(
+  quoteId: string,
+  itemId: string,
+  formData: FormData
+) {
+  const name = requireText(formData.get("name"), "Tên option phụ");
+  const spec = optionalText(formData.get("spec"));
+  const price = optionalInt(formData.get("price")) ?? 0;
+  await quoteQueries.createQuoteOptionItemVariant(itemId, { name, spec, price });
+  revalidatePath(`/admin/quotes/${quoteId}`);
+}
+
+export async function updateQuoteOptionItemVariantAction(
+  quoteId: string,
+  variantId: string,
+  formData: FormData
+) {
+  const name = optionalText(formData.get("name")) ?? undefined;
+  const spec = formData.has("spec") ? optionalText(formData.get("spec")) : undefined;
+  const price = optionalInt(formData.get("price")) ?? undefined;
+  await quoteQueries.updateQuoteOptionItemVariant(variantId, { name, spec, price });
+  revalidatePath(`/admin/quotes/${quoteId}`);
+}
+
+export async function deleteQuoteOptionItemVariantAction(quoteId: string, variantId: string) {
+  await quoteQueries.deleteQuoteOptionItemVariant(variantId);
+  revalidatePath(`/admin/quotes/${quoteId}`);
+}
+
 // ── Customer public selection ──
 
 export async function submitCustomerSelectionsAction(
   token: string,
-  selections: { roomId: string; optionId: string }[]
+  selections: { roomId: string; optionId: string }[],
+  itemVariantSelections: { itemId: string; variantId: string }[] = []
 ) {
-  await quoteQueries.submitCustomerSelections(token, selections);
+  await quoteQueries.submitCustomerSelections(token, selections, itemVariantSelections);
   revalidatePath(`/q/${token}`);
 }
 
