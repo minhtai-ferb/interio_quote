@@ -74,6 +74,7 @@ export default async function TemplatesPage() {
             <Link
               key={t.id}
               href={`/admin/templates/${t.id}`}
+              className="iq-grid-stack"
               style={{
                 display: "grid",
                 gridTemplateColumns: "110px minmax(190px,1.6fr) minmax(110px,1fr) minmax(140px,auto)",

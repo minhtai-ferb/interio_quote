@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored reference files from the Claude Design import — not part of
+    // the Next.js app, kept only as the original UI source of truth.
+    "_ds/**",
+    "image-slot.js",
+    "support.js",
   ]),
 ]);
 

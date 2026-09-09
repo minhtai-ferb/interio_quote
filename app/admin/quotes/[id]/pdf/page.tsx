@@ -50,7 +50,7 @@ export default async function QuotePdfPage({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 30 }}>
+      <div className="iq-grid-stack" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 30 }}>
         <div>
           <div style={{ fontSize: 10.5, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 8 }}>
             Khách hàng

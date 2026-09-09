@@ -16,6 +16,7 @@ import {
   deleteQuoteOptionImageAction,
 } from "@/actions/quote.actions";
 import { OptionCard } from "@/components/option-card";
+import { ActionForm } from "@/components/action-form";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { COLORS, STATUS_LABEL, statusColors, trieu } from "@/lib/theme";
 
@@ -36,7 +37,8 @@ export default async function QuoteEditorPage({
   if (!quote) notFound();
 
   const activeRoomId = sp.room ?? quote.rooms[0]?.id;
-  const activeRoom = quote.rooms.find((r) => r.id === activeRoomId) ?? null;
+  const activeRoom =
+    quote.rooms.find((r) => r.id === activeRoomId) ?? quote.rooms[0] ?? null;
   const isLocked = quote.status === "FINALIZED";
 
   const roomBudgets = quote.rooms.map((r) => {
@@ -67,14 +69,18 @@ export default async function QuoteEditorPage({
 
         <details style={{ marginTop: 18 }}>
           <summary style={{ cursor: "pointer", fontSize: 12, color: COLORS.muted, fontWeight: 600 }}>Sửa thông tin công trình</summary>
-          <form action={updateQuoteInfoAction.bind(null, quote.id)} style={{ display: "grid", gap: 10, marginTop: 12 }}>
+          <ActionForm
+            action={updateQuoteInfoAction.bind(null, quote.id)}
+            successMessage="Đã lưu thông tin công trình"
+            style={{ display: "grid", gap: 10, marginTop: 12 }}
+          >
             <input name="projectType" defaultValue={quote.projectType ?? ""} placeholder="Loại công trình" style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
             <input type="number" name="areaM2" defaultValue={quote.areaM2 ?? ""} placeholder="Diện tích (m²)" style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
             <input name="note" defaultValue={quote.note ?? ""} placeholder="Ghi chú" style={{ height: 34, padding: "0 8px", border: `1px solid ${COLORS.border}`, fontSize: 12.5 }} />
             <button type="submit" style={{ minHeight: 32, background: COLORS.navy, color: "#fff", border: 0, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
               Lưu
             </button>
-          </form>
+          </ActionForm>
         </details>
 
         <div style={{ height: 2, background: COLORS.text, margin: "24px 0 18px" }} />
@@ -102,12 +108,16 @@ export default async function QuoteEditorPage({
           ))}
         </div>
         {!isLocked && (
-          <form action={createQuoteRoomAction.bind(null, quote.id)} style={{ display: "flex", gap: 6 }}>
+          <ActionForm
+            action={createQuoteRoomAction.bind(null, quote.id)}
+            successMessage="Đã thêm khu vực"
+            style={{ display: "flex", gap: 6 }}
+          >
             <input name="name" placeholder="Tên khu vực mới" required style={{ flex: 1, minWidth: 0, height: 36, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
             <button type="submit" style={{ flex: "none", minHeight: 36, padding: "8px 12px", background: COLORS.navyTint, border: `1px solid ${COLORS.navy}`, color: COLORS.navy, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
               + Thêm
             </button>
-          </form>
+          </ActionForm>
         )}
       </div>
 
@@ -120,19 +130,23 @@ export default async function QuoteEditorPage({
               {isLocked ? (
                 <div style={{ fontSize: "clamp(22px,2.6vw,30px)", fontWeight: 600 }}>{activeRoom.name}</div>
               ) : (
-                <form action={updateQuoteRoomAction.bind(null, quote.id, activeRoom.id)} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <ActionForm
+                  action={updateQuoteRoomAction.bind(null, quote.id, activeRoom.id)}
+                  successMessage="Đã lưu tên khu vực"
+                  style={{ display: "flex", gap: 8, alignItems: "center" }}
+                >
                   <input name="name" defaultValue={activeRoom.name} style={{ fontSize: "clamp(20px,2.4vw,28px)", fontWeight: 600, border: 0, borderBottom: `2px solid ${COLORS.border}`, background: "transparent", minWidth: 200 }} />
                   <button type="submit" style={{ minHeight: 32, padding: "6px 10px", background: "#fff", border: `1px solid ${COLORS.border}`, cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
                     Lưu
                   </button>
-                </form>
+                </ActionForm>
               )}
               {!isLocked && (
-                <form action={deleteQuoteRoomAction.bind(null, quote.id, activeRoom.id)}>
+                <ActionForm action={deleteQuoteRoomAction.bind(null, quote.id, activeRoom.id)} successMessage="Đã xóa khu vực">
                   <button type="submit" style={{ minHeight: 32, padding: "6px 10px", background: "#fff", color: "#B42318", border: "1px solid #E4E9EE", cursor: "pointer", fontSize: 11.5, fontWeight: 600 }}>
                     Xóa khu vực
                   </button>
-                </form>
+                </ActionForm>
               )}
             </div>
 
@@ -163,7 +177,11 @@ export default async function QuoteEditorPage({
                 <div style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 12 }}>
                   Thêm phương án mới
                 </div>
-                <form action={createQuoteOptionAction.bind(null, quote.id, activeRoom.id)} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
+                <ActionForm
+                  action={createQuoteOptionAction.bind(null, quote.id, activeRoom.id)}
+                  successMessage="Đã thêm phương án"
+                  style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}
+                >
                   <input name="name" placeholder="Tên phương án" required style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13 }} />
                   <input type="number" name="priceFrom" placeholder="Giá từ" required min={0} step={100000} style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
                   <input type="number" name="priceTo" placeholder="Giá đến" required min={0} step={100000} style={{ height: 38, padding: "0 10px", border: `1px solid ${COLORS.border}`, fontSize: 13, textAlign: "right" }} />
@@ -171,7 +189,7 @@ export default async function QuoteEditorPage({
                   <button type="submit" style={{ minHeight: 38, padding: "9px 14px", background: COLORS.navy, color: "#fff", border: 0, cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}>
                     + Thêm phương án
                   </button>
-                </form>
+                </ActionForm>
               </div>
             )}
           </>

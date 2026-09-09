@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { COLORS } from "@/lib/theme";
+import { useToast } from "@/components/toast-provider";
 
 export function ImageUploader({
   folder,
@@ -12,6 +14,8 @@ export function ImageUploader({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
+  const router = useRouter();
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -27,8 +31,12 @@ export function ImageUploader({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Tải hình ảnh thất bại");
       await onUploaded(data.imageUrl, data.cloudinaryPublicId);
+      showToast("Đã thêm hình ảnh", "success");
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Tải hình ảnh thất bại");
+      const message = err instanceof Error ? err.message : "Tải hình ảnh thất bại";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setBusy(false);
     }

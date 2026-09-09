@@ -47,7 +47,7 @@ export default async function QuotesPage({
           type="text" name="q" defaultValue={sp.q ?? ""} placeholder="Tìm theo tên khách hàng…"
           style={{ flex: "1 1 240px", height: 38, padding: "0 12px", border: `1px solid ${COLORS.border}`, background: "#fff", fontSize: 13 }}
         />
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", maxWidth: "100%", overflowX: "auto" }}>
           {FILTERS.map((f) => (
             <Link
               key={f.value}
@@ -82,6 +82,7 @@ export default async function QuotesPage({
               <Link
                 key={q.id}
                 href={`/admin/quotes/${q.id}`}
+                className="iq-grid-stack"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "minmax(170px,1.5fr) minmax(130px,1.1fr) minmax(140px,1fr) minmax(170px,auto)",

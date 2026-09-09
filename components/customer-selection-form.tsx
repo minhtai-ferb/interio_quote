@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { COLORS, trieu, vnd } from "@/lib/theme";
 import { submitCustomerSelectionsAction } from "@/actions/quote.actions";
+import { useToast } from "@/components/toast-provider";
 
 export interface SelectionOption {
   id: string;
@@ -37,6 +38,7 @@ export function CustomerSelectionForm({
   alreadySubmitted: boolean;
 }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [selections, setSelections] = useState<Record<string, string | null>>(initialSelections);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -63,9 +65,12 @@ export function CustomerSelectionForm({
       try {
         await submitCustomerSelectionsAction(token, payload);
         setSubmitted(true);
+        showToast("Đã ghi nhận lựa chọn của bạn", "success");
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Gửi lựa chọn thất bại, vui lòng thử lại");
+        const message = err instanceof Error ? err.message : "Gửi lựa chọn thất bại, vui lòng thử lại";
+        setError(message);
+        showToast(message, "error");
       }
     });
   }

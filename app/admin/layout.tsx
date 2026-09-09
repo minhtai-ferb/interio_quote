@@ -12,7 +12,7 @@ export default function AdminLayout({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 26,
+          gap: 20,
           height: 60,
           padding: "0 clamp(16px,3vw,36px)",
           background: "#fff",
@@ -20,10 +20,12 @@ export default function AdminLayout({
           position: "sticky",
           top: 0,
           zIndex: 50,
+          overflowX: "auto",
         }}
       >
         <div
           style={{
+            flex: "none",
             fontSize: 12.5,
             fontWeight: 700,
             letterSpacing: ".18em",
@@ -34,7 +36,7 @@ export default function AdminLayout({
         >
           Nội Thất
         </div>
-        <nav style={{ display: "flex", gap: 2 }}>
+        <nav style={{ display: "flex", flex: "none", gap: 2 }}>
           <Link
             href="/admin/quotes"
             style={{
@@ -42,6 +44,7 @@ export default function AdminLayout({
               fontSize: 13,
               fontWeight: 600,
               color: COLORS.text,
+              whiteSpace: "nowrap",
             }}
           >
             Báo giá
@@ -53,13 +56,14 @@ export default function AdminLayout({
               fontSize: 13,
               fontWeight: 600,
               color: COLORS.text,
+              whiteSpace: "nowrap",
             }}
           >
             Templates
           </Link>
         </nav>
-        <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ flex: "1 0 auto", minWidth: 12 }} />
+        <div style={{ display: "flex", flex: "none", alignItems: "center", gap: 10 }}>
           <div
             style={{
               width: 30,
