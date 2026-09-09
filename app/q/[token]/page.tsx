@@ -66,16 +66,11 @@ export default async function CustomerQuotePage({
   return (
     <div style={{ background: "#fff" }}>
       <Header customerName={quote.customer.name} projectType={quote.projectType} areaM2={quote.areaM2} />
-      <div style={{ padding: "clamp(34px,5vw,66px) clamp(18px,5vw,64px)" }}>
-        <div style={{ fontSize: 11, letterSpacing: ".26em", textTransform: "uppercase", color: COLORS.muted, fontWeight: 600, marginBottom: 22 }}>
-          Phương án nội thất dành cho bạn
-        </div>
-        <div style={{ fontSize: 15.5, lineHeight: 1.7, maxWidth: "42em" }}>
-          Mỗi khu vực có nhiều mức đầu tư khác nhau. Chọn mức phù hợp cho từng khu vực — ngân sách cập nhật ngay theo lựa chọn của bạn.
-        </div>
-      </div>
       <CustomerSelectionForm
         token={quote.publicToken}
+        customerName={quote.customer.name}
+        projectType={quote.projectType}
+        areaM2={quote.areaM2}
         rooms={quote.rooms.map((r) => ({ id: r.id, name: r.name, options: r.options }))}
         initialSelections={initialSelections}
         alreadySubmitted={quote.status === "CUSTOMER_SUBMITTED"}

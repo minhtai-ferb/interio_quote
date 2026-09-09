@@ -83,7 +83,7 @@ export default async function LoginPage({
               type="submit"
               style={{ minHeight: 46, marginTop: 6, background: COLORS.navy, color: "#fff", border: 0, cursor: "pointer", fontSize: 13.5, fontWeight: 600, textAlign: "left", padding: "13px 16px" }}
             >
-              Sign in
+              Đăng nhập
             </button>
           </div>
         </form>
